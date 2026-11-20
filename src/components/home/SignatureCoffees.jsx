@@ -3,92 +3,90 @@
 import { memo, useCallback, useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, Heart, X, ShoppingBag, Check, ArrowRight } from "lucide-react";
+import { Fraunces, Instrument_Sans } from "next/font/google";
+import { Star, Heart, X, ShoppingBag, Check } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 
-/* -------------------------------------------------------------------------- */
-/*  Data & High-Quality Name-Matched Unsplash Imagery                         */
-/* -------------------------------------------------------------------------- */
+/*
+  Palette (shared with Hero)
+  roast #1A0F0A  mocha #2A1A11  crema #EAD7B9  foam #F6EEE2  copper #D08A4A  sage #8E9A74
+*/
+
+const display = Fraunces({ subsets: ["latin"], display: "swap" });
+const body = Instrument_Sans({ subsets: ["latin"], display: "swap" });
 
 const FAVORITES_KEY = "signature:favorites:v1";
 const TOAST_DURATION_MS = 2800;
 const MAX_QUANTITY = 10;
 
-// High-resolution Unsplash image generator optimized for rich dark coffee aesthetics
 const unsplash = (id, w = 600, h = 600) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&h=${h}&q=85`;
 
-/**
- * Coffee shape:
- * { id, name, rating, priceCents, image, roast, origin, notes }
- * Prices are stored in cents to avoid float/format bugs.
- */
 const DEFAULT_COFFEES = [
   {
     id: "latte-supreme",
     name: "Latte Supreme",
     rating: 4.8,
     priceCents: 1099,
-    image: unsplash("photo-1570968915860-54d5c301fa9f", 600, 600), // Creamy latte with delicate foam art
-    roast: "Medium Roast",
+    image: unsplash("photo-1570968915860-54d5c301fa9f", 600, 700),
+    roast: "Medium roast",
     origin: "Medellín, Colombia",
     notes:
-      "Velvety steamed whole milk layered over rich double-shot espresso with delicate rosette art.",
+      "Velvety steamed whole milk over a rich double-shot espresso, finished with rosette art.",
   },
   {
     id: "caramel-cloud",
     name: "Caramel Cloud",
     rating: 4.9,
     priceCents: 1299,
-    image: unsplash("photo-1572442388796-11668a67e53d", 600, 600), // Rich iced caramel foam specialty coffee
-    roast: "Light-Medium Roast",
+    image: unsplash("photo-1572442388796-11668a67e53d", 600, 700),
+    roast: "Light-medium roast",
     origin: "Antigua, Guatemala",
     notes:
-      "Whipped caramel cloud foam over slow-dripped espresso infused with Madagascar vanilla bean.",
+      "Whipped caramel foam over slow-dripped espresso with Madagascar vanilla.",
   },
   {
     id: "vanilla-ember",
     name: "Vanilla Ember",
     rating: 4.7,
     priceCents: 1499,
-    image: unsplash("photo-1514432324607-a09d9b4aefdd", 600, 600), // Warm vanilla and dark chocolate extraction
-    roast: "Dark Espresso Roast",
+    image: unsplash("photo-1514432324607-a09d9b4aefdd", 600, 700),
+    roast: "Dark espresso roast",
     origin: "Sidama, Ethiopia",
     notes:
-      "Warm spiced vanilla bean extraction with toasted brown sugar crema and dark chocolate dusting.",
+      "Warm spiced vanilla, toasted brown sugar crema and a dusting of dark chocolate.",
   },
   {
     id: "espresso-eclipse",
     name: "Espresso Eclipse",
     rating: 4.6,
     priceCents: 1194,
-    image: unsplash("photo-1510591509098-f4fdc6d0ff04", 600, 600), // Bold dark espresso shot with crema
-    roast: "Intense French Roast",
+    image: unsplash("photo-1510591509098-f4fdc6d0ff04", 600, 700),
+    roast: "Intense French roast",
     origin: "Sumatra Mandheling",
-    notes:
-      "Deep roast extraction featuring bold dark chocolate, smoky molasses, and a heavy, lingering crema.",
+    notes: "Bold dark chocolate, smoky molasses and a heavy, lingering crema.",
   },
   {
     id: "maple-morning",
     name: "Maple Morning",
     rating: 4.8,
     priceCents: 1250,
-    image: unsplash("photo-1541167760496-1628856ab772", 600, 600), // Cozy artisanal coffee cup with rich golden tones
-    roast: "Blonde Roast",
+    image: unsplash("photo-1541167760496-1628856ab772", 600, 700),
+    roast: "Blonde roast",
     origin: "Huehuetenango, Guatemala",
     notes:
-      "Pure organic Vermont maple syrup harmonized with light blonde roast espresso and oat milk foam.",
+      "Organic Vermont maple with a light blonde espresso and oat milk foam.",
   },
   {
     id: "cinnamon-drift",
     name: "Cinnamon Drift",
     rating: 4.4,
     priceCents: 1390,
-    image: unsplash("photo-1495474472287-4d71bcdd2085", 600, 600), // Spiced artisan pour-over coffee vibe
-    roast: "Artisanal Spiced Roast",
+    image: unsplash("photo-1495474472287-4d71bcdd2085", 600, 700),
+    roast: "Spiced roast",
     origin: "Yirgacheffe, Ethiopia",
     notes:
-      "Steeped Ceylon cinnamon bark and nutmeg infusion blended into a rich velvet coffee cream.",
+      "Ceylon cinnamon bark and nutmeg steeped into a velvet coffee cream.",
   },
 ];
 
@@ -97,36 +95,28 @@ const SIZES = [
   { id: "large", label: "Large (16oz)", priceDeltaCents: 0 },
 ];
 
-const priceFormatter = new Intl.NumberFormat("en-US", {
+const fmt = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
 });
-const formatPrice = (cents) => priceFormatter.format(cents / 100);
-
-/* -------------------------------------------------------------------------- */
-/*  Shared styles                                                             */
-/* -------------------------------------------------------------------------- */
+const formatPrice = (c) => fmt.format(c / 100);
 
 const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#DE9E57] focus-visible:ring-offset-2 focus-visible:ring-offset-[#120B06]";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D08A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A0F0A]";
 const focusRingDialog =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#DE9E57] focus-visible:ring-offset-2 focus-visible:ring-offset-[#191009]";
-const focusRingCard =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#DE9E57] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1C120A]";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D08A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#2A1A11]";
 
-/* -------------------------------------------------------------------------- */
-/*  Small building blocks                                                     */
 /* -------------------------------------------------------------------------- */
 
 const Rating = ({ value }) => (
-  <div
-    className="flex items-center gap-1 text-xs font-medium text-[#DE9E57]"
+  <span
+    className="inline-flex items-center gap-1 text-sm text-[#C9B697]"
     role="img"
     aria-label={`Rated ${value} out of 5`}
   >
-    <Star aria-hidden className="h-3.5 w-3.5 fill-[#DE9E57] stroke-none" />
+    <Star aria-hidden className="h-3.5 w-3.5 fill-[#D08A4A] stroke-none" />
     <span aria-hidden>{value.toFixed(1)}</span>
-  </div>
+  </span>
 );
 
 const CoffeeCard = memo(function CoffeeCard({
@@ -136,67 +126,67 @@ const CoffeeCard = memo(function CoffeeCard({
   onBuy,
 }) {
   return (
-    <li className="group relative flex flex-col overflow-hidden rounded-2xl border border-[#302014] bg-[#1C120A]/90 transition-all duration-300 hover:-translate-y-1.5 hover:border-[#DE9E57]/50 hover:shadow-2xl hover:shadow-black/70 motion-reduce:transform-none motion-reduce:transition-none">
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#140C07]">
-        <Image
-          src={coffee.image}
-          alt={coffee.name}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transform-none"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1C120A] via-transparent to-transparent opacity-60"
-        />
+    <li className="group flex flex-col">
+      {/* Arched window, same shape as the hero */}
+      <div className="relative">
+        <div className="relative aspect-[4/5] overflow-hidden rounded-t-[999px] rounded-b-3xl border border-[#EAD7B9]/20 p-2">
+          <div className="relative h-full w-full overflow-hidden rounded-t-[999px] rounded-b-2xl">
+            <Image
+              src={coffee.image}
+              alt={coffee.name}
+              fill
+              sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transform-none"
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => onToggleFavorite(coffee.id)}
+          aria-pressed={isFavorite}
+          aria-label={
+            isFavorite
+              ? `Remove ${coffee.name} from favorites`
+              : `Add ${coffee.name} to favorites`
+          }
+          className={`absolute bottom-5 right-5 cursor-pointer rounded-full bg-[#1A0F0A]/80 p-2.5 text-[#EAD7B9] backdrop-blur transition-colors hover:text-[#D08A4A] ${focusRing}`}
+        >
+          <Heart
+            aria-hidden
+            className={`h-4 w-4 ${isFavorite ? "fill-[#D08A4A] text-[#D08A4A]" : ""}`}
+          />
+        </button>
       </div>
 
-      <div className="flex flex-1 flex-col justify-between bg-[#1C120A]/95 p-4 sm:p-5">
-        <h3 className="text-sm font-semibold tracking-wide text-white transition-colors group-hover:text-[#DE9E57] sm:text-base">
+      <div className="mt-5 flex items-baseline gap-2">
+        <h3 className={`${display.className} shrink-0 text-xl text-[#F6EEE2]`}>
           {coffee.name}
         </h3>
+        <span
+          aria-hidden
+          className="mb-1 min-w-4 flex-1 border-b-2 border-dotted border-[#EAD7B9]/25"
+        />
+        <span className="shrink-0 text-base font-semibold tabular-nums text-[#D08A4A]">
+          {formatPrice(coffee.priceCents)}
+        </span>
+      </div>
 
-        <div className="mt-2 flex items-center justify-between">
-          <Rating value={coffee.rating} />
-          <span className="font-mono text-xs font-semibold tracking-tight text-[#F5EBE1] sm:text-sm">
-            {formatPrice(coffee.priceCents)}
-          </span>
-        </div>
+      <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#B9A58B]">
+        {coffee.notes}
+      </p>
 
-        <div className="mt-4 flex items-center justify-between border-t border-[#2A1B11] pt-3">
-          <button
-            type="button"
-            onClick={(e) => onBuy(coffee, e.currentTarget)}
-            aria-haspopup="dialog"
-            aria-label={`Buy ${coffee.name}`}
-            className={`group/btn inline-flex cursor-pointer items-center gap-1 rounded text-xs font-medium text-[#F5EBE1] transition-colors hover:text-[#DE9E57] ${focusRingCard}`}
-          >
-            <span>Buy now</span>
-            <ArrowRight
-              aria-hidden
-              className="h-3 w-3 transition-transform group-hover/btn:translate-x-1 motion-reduce:transform-none"
-            />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onToggleFavorite(coffee.id)}
-            aria-pressed={isFavorite}
-            aria-label={
-              isFavorite
-                ? `Remove ${coffee.name} from favorites`
-                : `Add ${coffee.name} to favorites`
-            }
-            className={`group/heart rounded-full p-1.5 text-[#A89A8D] transition-colors hover:text-[#DE9E57] ${focusRingCard}`}
-          >
-            <Heart
-              aria-hidden
-              className={`h-4 w-4 transition-transform duration-200 group-hover/heart:scale-[1.15] motion-reduce:transform-none ${
-                isFavorite ? "fill-[#DE9E57] text-[#DE9E57]" : "stroke-[1.8]"
-              }`}
-            />
-          </button>
-        </div>
+      <div className="mt-4 flex items-center justify-between">
+        <Rating value={coffee.rating} />
+        <button
+          type="button"
+          onClick={(e) => onBuy(coffee, e.currentTarget)}
+          aria-haspopup="dialog"
+          aria-label={`Order ${coffee.name}`}
+          className={`cursor-pointer rounded-full border border-[#EAD7B9]/30 px-5 py-2 text-sm font-medium text-[#F6EEE2] transition-colors hover:border-[#D08A4A] hover:bg-[#D08A4A] hover:text-[#1A0F0A] ${focusRing}`}
+        >
+          Order
+        </button>
       </div>
     </li>
   );
@@ -215,21 +205,21 @@ const OrderForm = ({ coffee, titleId, descId, onClose, onConfirm }) => {
   const totalCents = unitCents * quantity;
 
   return (
-    <div className="relative rounded-2xl border border-[#3D2919] bg-[#191009] p-6 shadow-2xl sm:p-7">
+    <div className="relative rounded-3xl border border-[#EAD7B9]/15 bg-[#2A1A11] p-7 shadow-2xl">
       <button
         type="button"
         onClick={onClose}
         aria-label="Close"
-        className={`absolute right-4 top-4 rounded-full p-1.5 text-[#A89A8D] transition-colors hover:text-[#DE9E57] ${focusRingDialog}`}
+        className={`absolute right-4 top-4 cursor-pointer rounded-full p-1.5 text-[#B9A58B] transition-colors hover:text-[#D08A4A] ${focusRingDialog}`}
       >
         <X aria-hidden className="h-5 w-5" />
       </button>
 
-      <div className="mb-4 flex items-center gap-4 pr-8">
-        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-[#3E2718]">
+      <div className="flex items-center gap-4 pr-8">
+        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full ring-1 ring-[#EAD7B9]/20">
           <Image
             src={coffee.image}
-            alt={coffee.name}
+            alt=""
             fill
             sizes="64px"
             className="object-cover"
@@ -238,12 +228,12 @@ const OrderForm = ({ coffee, titleId, descId, onClose, onConfirm }) => {
         <div className="min-w-0">
           <h2
             id={titleId}
-            className="font-serif text-lg font-semibold text-white"
+            className={`${display.className} text-2xl text-[#F6EEE2]`}
           >
             {coffee.name}
           </h2>
           <div className="mt-1 flex items-center gap-3">
-            <span className="font-mono text-base font-bold text-[#DE9E57]">
+            <span className="text-lg font-semibold tabular-nums text-[#D08A4A]">
               {formatPrice(unitCents)}
             </span>
             <Rating value={coffee.rating} />
@@ -253,16 +243,14 @@ const OrderForm = ({ coffee, titleId, descId, onClose, onConfirm }) => {
 
       <p
         id={descId}
-        className="mb-4 border-b border-[#2E1E13] pb-3 text-xs leading-relaxed text-[#C4B5A5]"
+        className="mt-5 border-y border-dotted border-[#EAD7B9]/25 py-4 text-sm leading-relaxed text-[#EAD7B9]"
       >
         {coffee.notes}
       </p>
 
-      <div className="mb-5 space-y-3">
+      <div className="mt-5 space-y-4">
         <fieldset>
-          <legend className="mb-2 text-xs font-medium text-[#C4B5A5]">
-            Cup size
-          </legend>
+          <legend className="mb-2 text-sm text-[#B9A58B]">Cup size</legend>
           <div className="grid grid-cols-2 gap-2">
             {SIZES.map((s) => (
               <label key={s.id} className="relative cursor-pointer">
@@ -274,7 +262,7 @@ const OrderForm = ({ coffee, titleId, descId, onClose, onConfirm }) => {
                   onChange={() => setSizeId(s.id)}
                   className="peer sr-only"
                 />
-                <span className="block rounded-lg border border-[#302014] py-2 text-center text-xs font-medium text-[#A89A8D] transition-all hover:border-[#DE9E57]/40 peer-checked:border-[#DE9E57] peer-checked:bg-[#DE9E57]/10 peer-checked:text-[#DE9E57] peer-focus-visible:ring-2 peer-focus-visible:ring-[#DE9E57] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[#191009]">
+                <span className="block rounded-full border border-[#EAD7B9]/20 py-2.5 text-center text-sm text-[#C9B697] transition-colors hover:border-[#D08A4A]/60 peer-checked:border-[#D08A4A] peer-checked:bg-[#D08A4A]/15 peer-checked:text-[#F6EEE2] peer-focus-visible:ring-2 peer-focus-visible:ring-[#D08A4A] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[#2A1A11]">
                   {s.label}
                 </span>
               </label>
@@ -282,30 +270,27 @@ const OrderForm = ({ coffee, titleId, descId, onClose, onConfirm }) => {
           </div>
         </fieldset>
 
-        <div className="flex items-center justify-between pt-2">
-          <span
-            id={`${titleId}-qty`}
-            className="text-xs font-medium text-[#C4B5A5]"
-          >
+        <div className="flex items-center justify-between">
+          <span id={`${titleId}-qty`} className="text-sm text-[#B9A58B]">
             Quantity
           </span>
           <div
             role="group"
             aria-labelledby={`${titleId}-qty`}
-            className="flex items-center gap-1 rounded-lg border border-[#302014] bg-[#120B06] px-1 py-1"
+            className="flex items-center gap-1 rounded-full border border-[#EAD7B9]/20 px-1.5 py-1"
           >
             <button
               type="button"
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
               disabled={quantity <= 1}
               aria-label="Decrease quantity"
-              className={`h-7 w-7 rounded text-sm font-bold text-[#A89A8D] transition-colors hover:text-[#DE9E57] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-[#A89A8D] ${focusRingDialog}`}
+              className={`h-8 w-8 cursor-pointer rounded-full text-lg text-[#C9B697] transition-colors hover:text-[#D08A4A] disabled:cursor-not-allowed disabled:opacity-40 ${focusRingDialog}`}
             >
               −
             </button>
             <output
               aria-live="polite"
-              className="w-6 text-center font-mono text-xs font-semibold text-white"
+              className="w-6 text-center text-sm font-semibold tabular-nums text-[#F6EEE2]"
             >
               {quantity}
             </output>
@@ -314,7 +299,7 @@ const OrderForm = ({ coffee, titleId, descId, onClose, onConfirm }) => {
               onClick={() => setQuantity((q) => Math.min(MAX_QUANTITY, q + 1))}
               disabled={quantity >= MAX_QUANTITY}
               aria-label="Increase quantity"
-              className={`h-7 w-7 rounded text-sm font-bold text-[#A89A8D] transition-colors hover:text-[#DE9E57] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-[#A89A8D] ${focusRingDialog}`}
+              className={`h-8 w-8 cursor-pointer rounded-full text-lg text-[#C9B697] transition-colors hover:text-[#D08A4A] disabled:cursor-not-allowed disabled:opacity-40 ${focusRingDialog}`}
             >
               +
             </button>
@@ -325,18 +310,17 @@ const OrderForm = ({ coffee, titleId, descId, onClose, onConfirm }) => {
       <button
         type="button"
         onClick={() => onConfirm({ coffee, size, quantity })}
-        className={`flex w-full items-center justify-center gap-2 rounded-xl bg-[#DE9E57] py-3 text-sm font-semibold text-[#120B06] shadow-md shadow-[#DE9E57]/10 transition-all duration-200 hover:bg-[#EBB36F] active:scale-[0.98] motion-reduce:transform-none cursor-pointer ${focusRingDialog}`}
+        className={`mt-6 flex w-full cursor-pointer items-center justify-between rounded-full bg-[#D08A4A] px-6 py-3 text-sm font-semibold text-[#1A0F0A] transition-colors hover:bg-[#E0A062] ${focusRingDialog}`}
       >
-        <ShoppingBag aria-hidden className="h-4 w-4" />
-        <span>Add to order · {formatPrice(totalCents)}</span>
+        <span className="flex items-center gap-2">
+          <ShoppingBag aria-hidden className="h-4 w-4" />
+          Add to order
+        </span>
+        <span className="tabular-nums">{formatPrice(totalCents)}</span>
       </button>
     </div>
   );
 };
-
-/* -------------------------------------------------------------------------- */
-/*  Dialog shell                                                              */
-/* -------------------------------------------------------------------------- */
 
 const OrderDialog = ({ coffee, onClose, onConfirm }) => {
   const dialogRef = useRef(null);
@@ -346,22 +330,16 @@ const OrderDialog = ({ coffee, onClose, onConfirm }) => {
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-
     if (coffee && !dialog.open) {
       dialog.showModal();
       document.body.style.overflow = "hidden";
     } else if (!coffee && dialog.open) {
       dialog.close();
     }
-
     return () => {
       document.body.style.overflow = "";
     };
   }, [coffee]);
-
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) onClose();
-  };
 
   return (
     <dialog
@@ -369,7 +347,7 @@ const OrderDialog = ({ coffee, onClose, onConfirm }) => {
       aria-labelledby={titleId}
       aria-describedby={descId}
       onClose={onClose}
-      onClick={handleBackdropClick}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
       className="m-auto w-[calc(100%-2rem)] max-w-md bg-transparent p-0 text-left backdrop:bg-black/80 backdrop:backdrop-blur-sm"
     >
       {coffee && (
@@ -385,6 +363,8 @@ const OrderDialog = ({ coffee, onClose, onConfirm }) => {
     </dialog>
   );
 };
+
+/* -------------------------------------------------------------------------- */
 
 export const SignatureCoffees = ({
   coffees = DEFAULT_COFFEES,
@@ -403,9 +383,7 @@ export const SignatureCoffees = ({
     try {
       const raw = window.localStorage.getItem(FAVORITES_KEY);
       if (raw) setFavorites(JSON.parse(raw));
-    } catch {
-      /* storage unavailable or corrupted */
-    }
+    } catch {}
     hydratedRef.current = true;
   }, []);
 
@@ -413,21 +391,15 @@ export const SignatureCoffees = ({
     if (!hydratedRef.current) return;
     try {
       window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-    } catch {
-      /* ignore */
-    }
+    } catch {}
   }, [favorites]);
 
-  useEffect(
-    () => () => {
-      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    },
+  useEffect(() => () => clearTimeout(toastTimerRef.current), []);
+
+  const toggleFavorite = useCallback(
+    (id) => setFavorites((p) => ({ ...p, [id]: !p[id] })),
     [],
   );
-
-  const toggleFavorite = useCallback((id) => {
-    setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
-  }, []);
 
   const openOrder = useCallback((coffee, trigger) => {
     lastTriggerRef.current = trigger;
@@ -445,7 +417,7 @@ export const SignatureCoffees = ({
       setToast(
         `Added ${order.quantity}× ${order.coffee.name} (${order.size.label}) to your order`,
       );
-      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      clearTimeout(toastTimerRef.current);
       toastTimerRef.current = setTimeout(() => setToast(""), TOAST_DURATION_MS);
       closeOrder();
     },
@@ -455,45 +427,36 @@ export const SignatureCoffees = ({
   return (
     <section
       aria-labelledby="signature-heading"
-      className="relative overflow-hidden bg-[#120B06] py-16 sm:py-20 lg:py-28"
+      className={`${body.className} relative overflow-hidden bg-[#1A0F0A] py-16 text-[#EAD7B9] sm:py-20 lg:py-28`}
     >
-      {/* Decorative curved lines */}
-      <svg
+      <div
         aria-hidden
-        focusable="false"
-        className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-20"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M -50 300 Q 250 180 500 450 T 1200 400"
-          fill="none"
-          stroke="#DE9E57"
-          strokeWidth="1"
-        />
-        <path
-          d="M 200 700 Q 600 550 900 750 T 1500 600"
-          fill="none"
-          stroke="#8C572D"
-          strokeWidth="1"
-        />
-      </svg>
+        className="pointer-events-none absolute right-0 top-0 h-[420px] w-[620px] translate-x-1/3 -translate-y-1/3 rounded-full bg-[radial-gradient(closest-side,rgba(208,138,74,0.18),transparent)]"
+      />
 
-      <Container className="relative z-10">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2
-            id="signature-heading"
-            className="text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-[42px]"
+      <Container className="relative">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-xl">
+            <h2
+              id="signature-heading"
+              className={`${display.className} text-balance text-4xl font-medium leading-tight tracking-tight text-[#F6EEE2] sm:text-5xl`}
+            >
+              Our signature coffees, made to be lingered over.
+            </h2>
+            <p className="mt-4 max-w-md text-base leading-relaxed text-[#C9B697]">
+              Six house drinks, each built around one origin and one idea. Pick
+              a favorite and we&apos;ll make it fresh.
+            </p>
+          </div>
+          <Link
+            href={viewAllHref}
+            className={`shrink-0 self-start rounded text-sm font-medium text-[#EAD7B9] underline decoration-[#EAD7B9]/40 underline-offset-8 transition-colors hover:decoration-[#D08A4A] sm:self-auto ${focusRing}`}
           >
-            Our signature coffees
-          </h2>
-          <p className="mt-4 text-xs leading-relaxed text-[#C4B5A5] sm:text-sm">
-            Explore our premium coffee blends, each one carefully crafted to
-            deliver rich, bold flavors that will transform your coffee
-            experience.
-          </p>
+            View the full menu
+          </Link>
         </div>
 
-        <ul className="mt-12 grid grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 sm:gap-7 lg:grid-cols-3">
+        <ul className="mt-14 grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
           {coffees.map((coffee) => (
             <CoffeeCard
               key={coffee.id}
@@ -504,15 +467,6 @@ export const SignatureCoffees = ({
             />
           ))}
         </ul>
-
-        <div className="mt-12 text-center sm:mt-14">
-          <Link
-            href={viewAllHref}
-            className={`inline-block rounded-sm border-b border-[#DE9E57] pb-0.5 text-xs font-medium text-[#F5EBE1] transition-colors hover:text-[#DE9E57] sm:text-sm ${focusRing}`}
-          >
-            View all
-          </Link>
-        </div>
       </Container>
 
       <OrderDialog
@@ -521,18 +475,17 @@ export const SignatureCoffees = ({
         onConfirm={confirmOrder}
       />
 
-      {/* Toast live region */}
       <div
         role="status"
         aria-live="polite"
         className="pointer-events-none fixed bottom-6 right-6 z-50 max-w-[calc(100vw-3rem)]"
       >
         {toast && (
-          <div className="pointer-events-auto flex items-center gap-2.5 rounded-xl border border-[#DE9E57]/40 bg-[#1C120B] px-4 py-3 text-xs font-medium text-[#F5EBE1] shadow-2xl animate-in slide-in-from-bottom-3 duration-300 motion-reduce:animate-none">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#DE9E57]/20 text-[#DE9E57]">
+          <div className="pointer-events-auto flex items-center gap-2.5 rounded-full border border-[#8E9A74]/40 bg-[#2A1A11] py-2.5 pl-3 pr-5 text-sm text-[#F6EEE2] shadow-2xl">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#8E9A74]/25 text-[#B7C39B]">
               <Check aria-hidden className="h-3.5 w-3.5" />
             </span>
-            <span>{toast}</span>
+            {toast}
           </div>
         )}
       </div>
