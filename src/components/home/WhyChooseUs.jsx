@@ -1,156 +1,278 @@
 "use client";
 
-import React, { useState } from "react";
+import { useEffect, useId, useState } from "react";
 import Image from "next/image";
+import { Fraunces, Instrument_Sans } from "next/font/google";
 import {
-  ArrowRight,
+  ArrowUpRight,
   X,
   Sparkles,
   ShieldCheck,
   Leaf,
   Flame,
   Coffee,
+  CheckCircle2,
 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 
-/* -------------------------------------------------------------------------- */
-/*  High-Quality Unsplash Image Builder                                       */
-/* -------------------------------------------------------------------------- */
+/*
+  Cafe Aura Palette (shared across sections)
+  roast  #1A0F0A
+  mocha  #2A1A11
+  crema  #EAD7B9
+  foam   #F6EEE2
+  copper #D08A4A
+  sage   #8E9A74
+*/
 
-const unsplash = (id, w = 600, h = 450) =>
+const display = Fraunces({ subsets: ["latin"], display: "swap" });
+const body = Instrument_Sans({ subsets: ["latin"], display: "swap" });
+
+const unsplash = (id, w = 800, h = 600) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&h=${h}&q=85`;
 
 const features = [
   {
     id: "premium-beans",
+    index: "01",
     title: "Premium Quality Beans",
+    subtitle: "Single-Origin & Direct Trade",
     description:
-      "We source only the finest coffee beans from sustainable farms around the world, flavorful, and ethically produced.",
-    image: unsplash("photo-1559056199-641a0ac8b55e", 600, 450), // Premium roasted beans macro
+      "We source only the finest coffee beans from sustainable farms around the world—flavorful, dense, and ethically produced.",
+    image: unsplash("photo-1559056199-641a0ac8b55e", 800, 600),
     icon: Coffee,
     badge: "100% Specialty Grade (85+ Score)",
     details:
       "Every single batch is sourced directly from ethical, high-altitude micro-lots in Colombia, Ethiopia, and Brazil. We guarantee fair trade pricing for farming families and uncompromised bean density.",
+    highlights: [
+      "85+ SCA Cupping Score",
+      "Direct-trade micro-lot partnerships",
+      "100% Shade-grown Arabica",
+    ],
   },
   {
     id: "freshness-guaranteed",
+    index: "02",
     title: "Freshness Guaranteed",
+    subtitle: "Small-Batch Drum Roasted",
     description:
       "Our beans are roasted to perfection and shipped directly to your door, ensuring the freshest possible coffee every time.",
-    image: unsplash("photo-1514432324607-a09d9b4aefdd", 600, 450), // Espresso extraction / roasting vibe
+    image: unsplash("photo-1514432324607-a09d9b4aefdd", 800, 600),
     icon: Flame,
     badge: "Micro-Batch Drum Roasted Daily",
     details:
       "We roast in small artisan drum batches. Every bag is hand-stamped with its exact roast date and fitted with a one-way degassing valve to lock in fragile aromatics and peak crema potential.",
+    highlights: [
+      "Shipped within 24 hours of roasting",
+      "Hand-stamped roast date on every bag",
+      "One-way aroma-lock degassing valve",
+    ],
   },
   {
     id: "variety-options",
+    index: "03",
     title: "Variety of Options",
+    subtitle: "Tailored for Every Brew",
     description:
       "Whether you're a fan of bold espressos, smooth lattes, or refreshing cold brews, we have a coffee to suit every taste.",
-    image: unsplash("photo-1570968915860-54d5c301fa9f", 600, 450), // Latte art & cups
+    image: unsplash("photo-1570968915860-54d5c301fa9f", 800, 600),
     icon: Sparkles,
     badge: "Curated Profiles & Roasts",
     details:
       "From delicate floral blonde roasts to rich dark French roasts, our master roasters have dialed in single-origin beans and signature blends tailored for pour-over, espresso, cold brew, and Aeropress.",
+    highlights: [
+      "Light, Medium & Dark roast spectrum",
+      "Whole bean or precision-ground to order",
+      "Seasonal limited-edition micro-lots",
+    ],
   },
   {
     id: "eco-packaging",
+    index: "04",
     title: "Eco-Friendly Packaging",
+    subtitle: "Zero-Waste Commitment",
     description:
       "Our packaging is 100% recyclable, and we're working hard to reduce our carbon footprint every step of the way.",
-    image: unsplash("photo-1511920170033-f8396924c348", 600, 450), // Sustainable cozy café atmosphere
+    image: unsplash("photo-1511920170033-f8396924c348", 800, 600),
     icon: Leaf,
     badge: "Plant-Based & 100% Recyclable",
     details:
       "We believe exceptional coffee shouldn't cost the earth. Our pouches are made from biodegradable plant cellulose, printed with water-based soy inks, and feature fully compostable degassing valves.",
+    highlights: [
+      "Biodegradable plant-cellulose lining",
+      "Non-toxic water-based soy inks",
+      "Carbon-neutral doorstep delivery",
+    ],
   },
 ];
 
+const focusRing =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D08A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A0F0A]";
+
 export const WhyChooseUs = () => {
   const [selectedFeature, setSelectedFeature] = useState(null);
+  const modalTitleId = useId();
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setSelectedFeature(null);
+    };
+
+    if (selectedFeature) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", onKeyDown);
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [selectedFeature]);
 
   return (
     <section
       id="why-us"
-      className="relative overflow-hidden bg-[#120B06] py-16 sm:py-20 lg:py-28"
+      aria-labelledby="why-us-heading"
+      className={`${body.className} relative overflow-hidden bg-[#1A0F0A] py-20 text-[#EAD7B9] sm:py-24 lg:py-32`}
     >
-      {/* Decorative Golden Trajectory Curves */}
+      {/* Ambient Copper & Sage Glows */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-24 h-[460px] w-[860px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(208,138,74,0.12),transparent)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-24 bottom-12 h-80 w-80 rounded-full bg-[radial-gradient(closest-side,rgba(142,154,116,0.08),transparent)]"
+      />
+
+      {/* Decorative Copper Trajectory Curves */}
       <svg
-        className="absolute inset-0 w-full h-full pointer-events-none opacity-20 -z-0"
+        aria-hidden
+        className="pointer-events-none absolute inset-0 h-full w-full opacity-25"
         xmlns="http://www.w3.org/2000/svg"
       >
+        <defs>
+          <linearGradient id="auraCurve" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#D08A4A" stopOpacity="0" />
+            <stop offset="50%" stopColor="#D08A4A" stopOpacity="0.65" />
+            <stop offset="100%" stopColor="#D08A4A" stopOpacity="0" />
+          </linearGradient>
+        </defs>
         <path
-          d="M 50 350 Q 300 200 650 450 T 1350 250"
+          d="M -40 340 Q 340 160 720 430 T 1560 220"
           fill="none"
-          stroke="#DE9E57"
-          strokeWidth="1"
+          stroke="url(#auraCurve)"
+          strokeWidth="1.2"
         />
         <path
-          d="M 100 800 Q 450 650 850 750 T 1500 550"
+          d="M 60 800 Q 480 620 900 740 T 1600 520"
           fill="none"
-          stroke="#8C572D"
+          stroke="url(#auraCurve)"
           strokeWidth="1"
         />
       </svg>
 
       <Container className="relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-white leading-tight">
-            Why Choose Us?
+        <div className="mx-auto max-w-2xl text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#EAD7B9]/15 bg-[#2A1A11]/80 px-3.5 py-1.5 text-xs font-medium tracking-wide text-[#D08A4A]">
+            <Sparkles aria-hidden className="h-3.5 w-3.5" />
+            <span>The Café Aura Standard</span>
+          </div>
+
+          <h2
+            id="why-us-heading"
+            className={`${display.className} mt-5 text-balance text-4xl font-medium leading-[1.12] tracking-tight text-[#F6EEE2] sm:text-5xl`}
+          >
+            Why{" "}
+            <span className="italic font-normal text-[#D08A4A]">choose us</span>{" "}
+            for your daily cup?
           </h2>
-          <p className="mt-4 text-xs sm:text-sm text-[#C4B5A5] leading-relaxed font-normal">
-            From bean to cup, we ensure every sip is a premium experience.
+
+          <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-[#C9B697]">
+            From bean to cup, we ensure every sip is a premium, unhurried
+            experience.
           </p>
         </div>
 
-        {/* 4 Feature Columns Grid */}
-        <div className="mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-7">
-          {features.map((feature) => (
-            <div
-              key={feature.id}
-              className="group relative flex flex-col justify-between pl-0 lg:pl-5 border-l-0 lg:border-l border-[#2B1B10] hover:border-[#DE9E57]/40 transition-colors duration-300"
-            >
-              {/* Feature Top: Image & Text */}
-              <div>
-                {/* Photo Container */}
-                <div className="relative aspect-[1.4/1] w-full overflow-hidden rounded-2xl bg-[#180E07] border border-[#2E1D11] shadow-lg group-hover:border-[#DE9E57]/40 transition-all duration-300">
-                  <Image
-                    src={feature.image}
-                    alt={feature.title}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  {/* Subtle inner gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 pointer-events-none" />
+        {/* 4 Feature Cards Grid */}
+        <div className="mt-14 grid grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 lg:grid-cols-4 lg:gap-7">
+          {features.map((feature) => {
+            const Icon = feature.icon;
+            return (
+              <article
+                key={feature.id}
+                className="group relative flex flex-col justify-between rounded-3xl border border-[#EAD7B9]/15 bg-gradient-to-b from-[#2A1A11]/90 to-[#22140D]/95 p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.75)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#D08A4A]/45 sm:p-5"
+              >
+                {/* Top Copper Accent Hairline */}
+                <div
+                  aria-hidden
+                  className="absolute inset-x-7 top-0 h-px bg-gradient-to-r from-transparent via-[#D08A4A]/55 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                />
+
+                <div>
+                  {/* Photo Container */}
+                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-[#EAD7B9]/15 bg-[#1A0F0A]">
+                    <Image
+                      src={feature.image}
+                      alt={feature.title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1A0F0A]/85 via-[#1A0F0A]/20 to-transparent" />
+
+                    {/* Top Index + Icon Pill */}
+                    <div className="absolute inset-x-3 top-3 flex items-center justify-between">
+                      <span className="rounded-full border border-[#EAD7B9]/20 bg-[#1A0F0A]/80 px-2.5 py-0.5 text-[11px] font-medium tabular-nums tracking-wider text-[#D08A4A] backdrop-blur-md">
+                        {feature.index}
+                      </span>
+
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[#EAD7B9]/15 bg-[#1A0F0A]/80 text-[#D08A4A] backdrop-blur-md transition-colors duration-300 group-hover:border-[#D08A4A] group-hover:bg-[#D08A4A] group-hover:text-[#1A0F0A]">
+                        <Icon aria-hidden className="h-4 w-4" />
+                      </span>
+                    </div>
+
+                    {/* Subtitle Tag inside Image */}
+                    <p className="absolute bottom-2.5 left-3 right-3 text-[11px] font-medium uppercase tracking-wider text-[#EAD7B9]/90">
+                      {feature.subtitle}
+                    </p>
+                  </div>
+
+                  {/* Title & Description */}
+                  <div className="mt-5 px-1">
+                    <h3
+                      className={`${display.className} text-xl font-medium leading-snug text-[#F6EEE2] transition-colors group-hover:text-[#D08A4A]`}
+                    >
+                      {feature.title}
+                    </h3>
+
+                    <p className="mt-2.5 text-sm leading-relaxed text-[#C9B697]">
+                      {feature.description}
+                    </p>
+                  </div>
                 </div>
 
-                {/* Title */}
-                <h3 className="mt-5 text-sm sm:text-base font-semibold text-white tracking-wide group-hover:text-[#DE9E57] transition-colors">
-                  {feature.title}
-                </h3>
+                {/* Bottom Dotted Divider & CTA Button */}
+                <div className="mt-6 flex items-center justify-between border-t border-dotted border-[#EAD7B9]/20 px-1 pt-4">
+                  <span className="text-xs font-medium text-[#B9A58B] transition-colors group-hover:text-[#F6EEE2]">
+                    Read roastery notes
+                  </span>
 
-                {/* Description */}
-                <p className="mt-2.5 text-xs text-[#C4B5A5] leading-relaxed font-normal">
-                  {feature.description}
-                </p>
-              </div>
-
-              {/* Bottom Outlined Arrow Button */}
-              <div className="mt-5 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedFeature(feature)}
-                  aria-label={`Learn more about ${feature.title}`}
-                  className="inline-flex items-center justify-center w-10 h-7 rounded-lg border border-[#443022] bg-[#160D07]/80 text-[#C4B5A5] hover:border-[#DE9E57] hover:text-[#DE9E57] hover:bg-[#DE9E57]/10 transition-all duration-200 active:scale-95 focus:outline-none cursor-pointer group/btn"
-                >
-                  <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/btn:translate-x-0.5" />
-                </button>
-              </div>
-            </div>
-          ))}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedFeature(feature)}
+                    aria-label={`Learn more about ${feature.title}`}
+                    className={`inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#EAD7B9]/20 bg-[#1A0F0A]/70 text-[#EAD7B9] transition-all duration-200 hover:border-[#D08A4A] hover:bg-[#D08A4A] hover:text-[#1A0F0A] active:scale-95 ${focusRing}`}
+                  >
+                    <ArrowUpRight aria-hidden className="h-4 w-4" />
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </Container>
 
@@ -159,51 +281,93 @@ export const WhyChooseUs = () => {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+          aria-labelledby={modalTitleId}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#1A0F0A]/85 p-4 backdrop-blur-md sm:p-6"
           onClick={() => setSelectedFeature(null)}
         >
           <div
-            className="w-full max-w-lg bg-[#191009] border border-[#3D2919] rounded-2xl p-6 sm:p-8 shadow-2xl relative"
+            className="relative w-full max-w-xl overflow-hidden rounded-3xl border border-[#EAD7B9]/20 bg-gradient-to-b from-[#2A1A11] to-[#1F120C] shadow-[0_28px_70px_-15px_rgba(0,0,0,0.85)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              type="button"
-              onClick={() => setSelectedFeature(null)}
-              className="absolute top-5 right-5 text-[#8A7868] hover:text-[#DE9E57] transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="relative w-full h-44 rounded-xl overflow-hidden border border-[#3E2718] mb-5">
+            {/* Modal Image Header */}
+            <div className="relative h-52 w-full overflow-hidden sm:h-60">
               <Image
                 src={selectedFeature.image}
                 alt={selectedFeature.title}
                 fill
-                sizes="500px"
+                sizes="600px"
                 className="object-cover"
               />
-              <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/70 backdrop-blur-sm text-[11px] font-semibold text-[#DE9E57] flex items-center gap-1.5 border border-[#DE9E57]/30">
-                <ShieldCheck className="w-3.5 h-3.5" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#2A1A11] via-[#2A1A11]/30 to-black/25" />
+
+              <button
+                type="button"
+                onClick={() => setSelectedFeature(null)}
+                aria-label="Close modal"
+                className={`absolute right-4 top-4 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#EAD7B9]/20 bg-[#1A0F0A]/80 text-[#EAD7B9] backdrop-blur-md transition-colors hover:border-[#D08A4A] hover:bg-[#D08A4A] hover:text-[#1A0F0A] ${focusRing}`}
+              >
+                <X aria-hidden className="h-4 w-4" />
+              </button>
+
+              <div className="absolute bottom-4 left-6 inline-flex items-center gap-2 rounded-full border border-[#D08A4A]/35 bg-[#1A0F0A]/85 px-3.5 py-1.5 text-xs font-medium text-[#D08A4A] backdrop-blur-md">
+                <ShieldCheck aria-hidden className="h-4 w-4 shrink-0" />
                 <span>{selectedFeature.badge}</span>
               </div>
             </div>
 
-            <h4 className="font-serif text-xl font-semibold text-white">
-              {selectedFeature.title}
-            </h4>
+            {/* Modal Content */}
+            <div className="p-6 pt-3 sm:p-8 sm:pt-4">
+              <p className="text-xs font-medium uppercase tracking-wider text-[#B9A58B]">
+                Pillar {selectedFeature.index} ·{" "}
+                <span className="text-[#D08A4A]">
+                  {selectedFeature.subtitle}
+                </span>
+              </p>
 
-            <p className="mt-2 text-xs sm:text-sm text-[#C4B5A5] leading-relaxed">
-              {selectedFeature.details}
-            </p>
-
-            <div className="mt-6 pt-4 border-t border-[#2A1B11] flex justify-end">
-              <button
-                type="button"
-                onClick={() => setSelectedFeature(null)}
-                className="px-5 py-2 rounded-xl bg-[#DE9E57] hover:bg-[#EBB36F] text-[#120B06] font-semibold text-xs sm:text-sm transition-all duration-200 active:scale-95 cursor-pointer"
+              <h3
+                id={modalTitleId}
+                className={`${display.className} mt-1.5 text-2xl font-medium text-[#F6EEE2] sm:text-3xl`}
               >
-                Close
-              </button>
+                {selectedFeature.title}
+              </h3>
+
+              <p className="mt-3 text-sm leading-relaxed text-[#C9B697]">
+                {selectedFeature.details}
+              </p>
+
+              {/* Sage Quality Guarantees */}
+              <div className="mt-6 border-t border-dotted border-[#EAD7B9]/20 pt-5">
+                <p className="text-xs font-medium uppercase tracking-wider text-[#B9A58B]">
+                  Quality Guarantees
+                </p>
+                <ul className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                  {selectedFeature.highlights.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-2 text-xs text-[#EAD7B9]"
+                    >
+                      <CheckCircle2
+                        aria-hidden
+                        className="h-4 w-4 shrink-0 text-[#8E9A74]"
+                      />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="mt-7 flex items-center justify-between border-t border-dotted border-[#EAD7B9]/20 pt-4">
+                <span className="hidden text-xs text-[#9E8B76] sm:inline">
+                  Café Aura Roastery Promise
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedFeature(null)}
+                  className={`w-full cursor-pointer rounded-full bg-[#D08A4A] px-6 py-2.5 text-sm font-semibold text-[#1A0F0A] transition-all duration-200 hover:bg-[#DC995B] active:scale-95 sm:w-auto ${focusRing}`}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
