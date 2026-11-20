@@ -1,24 +1,33 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { Fraunces, Instrument_Sans } from "next/font/google";
 import { Container } from "@/components/ui/Container";
 
-/* -------------------------------------------------------------------------- */
-/*  High-Quality Unsplash Image Builder                                       */
-/* -------------------------------------------------------------------------- */
+/*
+  Palette (shared with Hero + SignatureCoffees)
+  roast #1A0F0A  mocha #2A1A11  crema #EAD7B9  foam #F6EEE2  copper #D08A4A  sage #8E9A74
+*/
+
+const display = Fraunces({ subsets: ["latin"], display: "swap" });
+const body = Instrument_Sans({ subsets: ["latin"], display: "swap" });
 
 const unsplash = (id, w = 800, h = 800) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&h=${h}&q=85`;
 
-/**
- * Custom vector Coffee Bean Icon for ticker & decorations
- */
+const focusRing =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D08A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A0F0A]";
+
 export function CoffeeBeanIcon({ className = "w-4 h-4 text-[#C88A4B]" }) {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden
+    >
       <ellipse
         cx="12"
         cy="12"
@@ -29,7 +38,7 @@ export function CoffeeBeanIcon({ className = "w-4 h-4 text-[#C88A4B]" }) {
       />
       <path
         d="M8.2 5.5 C 10 9.5, 14 14.5, 15.8 18.5"
-        stroke="#120B06"
+        stroke="#1A0F0A"
         strokeWidth="1.8"
         strokeLinecap="round"
         fill="none"
@@ -48,146 +57,124 @@ const coffeeVarieties = [
 
 export const OurStory = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const moreId = useId();
 
   return (
-    <section className="relative overflow-hidden bg-[#120B06] pt-16 sm:pt-20 lg:pt-28 pb-0">
-      {/* Atmospheric Ambient Glow behind illustration */}
-      <div className="absolute top-1/3 right-10 -z-10 h-80 w-80 sm:h-96 sm:w-96 rounded-full bg-[#DE9E57]/10 blur-[110px] pointer-events-none" />
+    <section
+      aria-labelledby="story-heading"
+      className={`${body.className} relative overflow-hidden bg-[#1A0F0A] pt-16 text-[#EAD7B9] sm:pt-20 lg:pt-28`}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-0 top-1/3 h-[460px] w-[560px] -translate-x-1/3 rounded-full bg-[radial-gradient(closest-side,rgba(208,138,74,0.16),transparent)]"
+      />
 
-      {/* Subtle connecting golden line */}
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none opacity-15 -z-0"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M 100 150 Q 400 80 800 220 T 1600 180"
-          fill="none"
-          stroke="#DE9E57"
-          strokeWidth="1"
-        />
-      </svg>
-
-      <Container className="relative z-10">
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-14">
-          {/* Left Column: Storytelling Copy & CTA */}
-          <div className="lg:col-span-6 xl:col-span-5 text-left">
-            <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
-              Our Story
-            </h2>
-
-            <p className="mt-3 text-sm sm:text-base font-medium text-[#E5D7CA] tracking-wide">
-              From Passion to Perfection: The Journey of Café Aura
-            </p>
-
-            <div className="mt-5 text-xs sm:text-sm text-[#C4B5A5] leading-relaxed font-normal">
-              <p>
-                At Café Aura, coffee isn&apos;t just a drink — it&apos;s a
-                passion, a ritual, and an experience. Our journey began in 1954,
-                when a group of coffee lovers came together with a simple
-                mission: to create exceptional coffee that people could truly
-                enjoy, share, and savor every day{" "}
-                <button
-                  type="button"
-                  onClick={() => setIsExpanded(!isExpanded)}
-                  className="inline font-medium text-[#DE9E57] hover:text-[#EBB36F] transition-colors underline-offset-2 hover:underline focus:outline-none"
-                >
-                  {isExpanded ? "Read less" : "Read more..."}
-                </button>
-              </p>
-
-              {isExpanded && (
-                <div className="mt-3 pt-3 border-t border-[#2E1E12] space-y-2.5 animate-in fade-in duration-300">
-                  <p>
-                    From single-origin high-altitude beans to micro-batch drum
-                    roasting, every blend is crafted with meticulous care. We
-                    partner directly with fair-trade, sustainable farms in
-                    Colombia, Ethiopia, and Guatemala to honor the earth and
-                    elevate your daily ritual.
-                  </p>
-                  <p className="text-[#DE9E57] font-medium text-xs">
-                    ✦ 100% Arabica Specialty Grade • Hand-Sorted & Small-Batch
-                    Roasted
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Sub-CTA Area */}
-            <div className="mt-10 sm:mt-14">
-              <p className="text-sm sm:text-base font-medium text-white max-w-sm leading-snug">
-                Want to experience the quality and care behind every cup?
-              </p>
-
-              <div className="mt-4">
-                <Link
-                  href="#coffee"
-                  className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#7B4C26] to-[#8C572D] text-[#FDFBF7] text-xs sm:text-sm font-semibold tracking-wide shadow-lg shadow-[#7B4C26]/25 hover:from-[#8C572D] hover:to-[#9D6335] hover:scale-[1.02] active:scale-95 transition-all duration-200 border border-[#A66F3E]/40"
-                >
-                  Shop Now
-                </Link>
+      <Container className="relative">
+        <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-16">
+          {/* Image: same arch as the rest of the page, with a sage outline offset behind it */}
+          <div className="relative mx-auto w-full max-w-[380px] lg:col-span-5 lg:max-w-[440px]">
+            <div
+              aria-hidden
+              className="absolute inset-0 translate-x-4 translate-y-4 rounded-t-[999px] rounded-b-3xl border border-[#8E9A74]/50 sm:translate-x-5 sm:translate-y-5"
+            />
+            <div className="relative aspect-[4/5] overflow-hidden rounded-t-[999px] rounded-b-3xl border border-[#EAD7B9]/20 bg-[#1A0F0A] p-2.5">
+              <div className="relative h-full w-full overflow-hidden rounded-t-[999px] rounded-b-2xl">
+                <Image
+                  src={unsplash("photo-1495474472287-4d71bcdd2085", 800, 1000)}
+                  alt="Coffee being poured at Café Aura"
+                  fill
+                  sizes="(max-width: 1024px) 380px, 440px"
+                  className="object-cover"
+                />
               </div>
             </div>
           </div>
 
-          {/* Right Column: High-Quality Professional Coffee Brewing Image */}
-          <div className="lg:col-span-6 xl:col-span-7 flex justify-center lg:justify-end items-end relative">
-            <div className="relative w-full max-w-[460px] sm:max-w-[520px] lg:max-w-[580px] aspect-[4/3] sm:aspect-[1.15/1] flex items-end">
-              <div className="relative h-full w-full overflow-hidden rounded-3xl shadow-2xl border border-[#3E2718]/40 bg-[#191009]">
-                <Image
-                  src={unsplash("photo-1495474472287-4d71bcdd2085", 900, 900)}
-                  alt="Café Aura artisanal coffee extraction and premium roasted beans"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 580px"
-                  className="object-cover transition-transform duration-700 hover:scale-105"
-                />
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#120B06] via-transparent to-transparent opacity-50"
-                />
+          {/* Copy */}
+          <div className="lg:col-span-7">
+            <h2
+              id="story-heading"
+              className={`${display.className} text-balance text-4xl font-medium leading-[1.08] tracking-tight text-[#F6EEE2] sm:text-5xl lg:text-6xl`}
+            >
+              We started with a few friends, one roaster and a very good cup.
+            </h2>
+
+            <div className="mt-6 max-w-lg space-y-4 text-base leading-relaxed text-[#C9B697]">
+              <p>
+                Café Aura began in 1954, when a group of coffee lovers set out
+                to make exceptional coffee that people could enjoy, share and
+                savor every day. We still do it the same way: small batches,
+                patient roasting, and no shortcuts.
+              </p>
+
+              <div
+                id={moreId}
+                hidden={!isExpanded}
+                className="space-y-4 border-t border-dotted border-[#EAD7B9]/25 pt-4"
+              >
+                <p>
+                  We buy single-origin, high-altitude beans directly from
+                  fair-trade farms in Colombia, Ethiopia and Guatemala, then
+                  roast them in micro-batches on a drum roaster.
+                </p>
+                <p className="text-[#EAD7B9]">
+                  Every bean is 100% Arabica specialty grade and sorted by hand.
+                </p>
               </div>
+
+              <button
+                type="button"
+                onClick={() => setIsExpanded((v) => !v)}
+                aria-expanded={isExpanded}
+                aria-controls={moreId}
+                className={`cursor-pointer rounded text-sm font-medium text-[#EAD7B9] underline decoration-[#EAD7B9]/40 underline-offset-8 transition-colors hover:decoration-[#D08A4A] ${focusRing}`}
+              >
+                {isExpanded ? "Read less" : "Read the rest of our story"}
+              </button>
+            </div>
+
+            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
+              <Link
+                href="/coffee"
+                className={`inline-flex items-center rounded-full bg-[#D08A4A] px-7 py-3.5 text-sm font-semibold text-[#1A0F0A] transition-colors hover:bg-[#E0A062] ${focusRing}`}
+              >
+                Shop our coffee
+              </Link>
+              <p className="max-w-[16rem] text-sm leading-snug text-[#B9A58B]">
+                Taste the care behind every cup.
+              </p>
             </div>
           </div>
         </div>
       </Container>
 
-      {/* Bottom Full-Width Coffee Varieties Marquee / Bar */}
-      <div className="mt-8 sm:mt-12 w-full border-t border-[#23150C] bg-[#0A0502]/95 backdrop-blur-md py-4 sm:py-5 overflow-hidden">
+      {/* Varieties strip */}
+      <nav
+        aria-label="Coffee varieties"
+        className="mt-16 border-t border-[#EAD7B9]/10 bg-[#2A1A11]/60 py-5 sm:mt-20"
+      >
         <Container>
-          {/* Desktop Static Bar / Centered Display */}
-          <div className="hidden md:flex items-center justify-around gap-6 text-sm font-medium tracking-wide text-white">
+          <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 sm:justify-around">
             {coffeeVarieties.map((variety, index) => (
               <React.Fragment key={variety}>
-                <Link
-                  href="#coffee"
-                  className="hover:text-[#DE9E57] transition-colors select-none"
-                >
-                  {variety}
-                </Link>
+                <li>
+                  <Link
+                    href="#coffee"
+                    className={`${display.className} rounded text-lg text-[#F6EEE2] transition-colors hover:text-[#D08A4A] ${focusRing}`}
+                  >
+                    {variety}
+                  </Link>
+                </li>
                 {index < coffeeVarieties.length - 1 && (
-                  <CoffeeBeanIcon className="w-4 h-4 text-[#A86F3E] shrink-0" />
+                  <li aria-hidden className="hidden sm:block">
+                    <CoffeeBeanIcon className="h-4 w-4 text-[#A86F3E]" />
+                  </li>
                 )}
               </React.Fragment>
             ))}
-          </div>
-
-          {/* Mobile / Tablet Continuous Responsive Marquee */}
-          <div className="flex md:hidden items-center justify-center gap-4 text-xs font-medium tracking-wide text-white overflow-x-auto no-scrollbar py-1">
-            {coffeeVarieties.map((variety, index) => (
-              <React.Fragment key={variety}>
-                <Link
-                  href="#coffee"
-                  className="hover:text-[#DE9E57] transition-colors whitespace-nowrap shrink-0"
-                >
-                  {variety}
-                </Link>
-                {index < coffeeVarieties.length - 1 && (
-                  <CoffeeBeanIcon className="w-3.5 h-3.5 text-[#A86F3E] shrink-0" />
-                )}
-              </React.Fragment>
-            ))}
-          </div>
+          </ul>
         </Container>
-      </div>
+      </nav>
     </section>
   );
 };

@@ -1,13 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import { useId, useRef, useState } from "react";
 import Image from "next/image";
+import { Fraunces, Instrument_Sans } from "next/font/google";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 
-/* -------------------------------------------------------------------------- */
-/*  High-Quality Unsplash Image Builder                                       */
-/* -------------------------------------------------------------------------- */
+/*
+  Palette (shared with the rest of the page)
+  roast #1A0F0A  mocha #2A1A11  crema #EAD7B9  foam #F6EEE2  copper #D08A4A  sage #8E9A74
+*/
+
+const display = Fraunces({ subsets: ["latin"], display: "swap" });
+const body = Instrument_Sans({ subsets: ["latin"], display: "swap" });
 
 const unsplash = (id, w = 200, h = 200) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&h=${h}&q=85`;
@@ -17,7 +22,7 @@ const testimonials = [
     id: 1,
     name: "Jonh De",
     role: "Teacher",
-    image: unsplash("photo-1534528741775-53994a69daeb", 120, 120),
+    image: unsplash("photo-1534528741775-53994a69daeb", 160, 160),
     rating: 5,
     quote:
       "I love spending my downtime in a cozy coffee shop, surrounded by the sweet aroma of freshly brewed drinks and pastries.",
@@ -26,16 +31,16 @@ const testimonials = [
     id: 2,
     name: "Kamal Hassan",
     role: "Professor",
-    image: unsplash("photo-1507003211169-0a1dd7228f2d", 120, 120),
+    image: unsplash("photo-1507003211169-0a1dd7228f2d", 160, 160),
     rating: 5,
     quote:
-      "The Brazilian Cerrado Gold has completely elevated my morning routine. Unrivaled consistency and nuanced dark cocoa notes.",
+      "The Brazilian Cerrado has completely elevated my morning routine. Unrivaled consistency and nuanced dark cocoa notes.",
   },
   {
     id: 3,
     name: "Rakib Khan",
     role: "Designer",
-    image: unsplash("photo-1500648767791-00dcc994a43e", 120, 120),
+    image: unsplash("photo-1500648767791-00dcc994a43e", 160, 160),
     rating: 5,
     quote:
       "As a designer, I appreciate thoughtful craft. Café Aura nails both the exquisite crema and the soulful atmosphere.",
@@ -44,224 +49,191 @@ const testimonials = [
     id: 4,
     name: "Elena Rostova",
     role: "Architect",
-    image: unsplash("photo-1494790108377-be9c29b29330", 120, 120),
+    image: unsplash("photo-1494790108377-be9c29b29330", 160, 160),
     rating: 5,
     quote:
-      "Their single-origin Ethiopian roast offers a sublime citrus bouquet. Hands down the finest specialty coffee experience in the city.",
+      "Their single-origin Ethiopian roast has a sublime citrus bouquet. Hands down the finest specialty coffee in the city.",
   },
   {
     id: 5,
     name: "Marcus Vance",
     role: "Sommelier",
-    image: unsplash("photo-1517841905240-472988babdf9", 120, 120),
+    image: unsplash("photo-1517841905240-472988babdf9", 160, 160),
     rating: 5,
     quote:
-      "From bean density to precise roast curves, the balance of velvety body and lingering hazelnut finish is sheer artisan mastery.",
+      "From bean density to roast curve, the balance of velvety body and lingering hazelnut finish is sheer artisan mastery.",
   },
 ];
 
+const focusRing =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D08A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A0F0A]";
+
 export const Testimonials = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [active, setActive] = useState(0);
+  const baseId = useId();
+  const tabRefs = useRef([]);
+  const count = testimonials.length;
+  const current = testimonials[active];
 
-  const prevReview = () => {
-    setActiveIndex((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1));
+  const go = (index, focus = false) => {
+    const next = (index + count) % count;
+    setActive(next);
+    if (focus) tabRefs.current[next]?.focus();
   };
 
-  const nextReview = () => {
-    setActiveIndex((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1));
+  const onTabKeyDown = (e) => {
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      go(active + 1, true);
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      go(active - 1, true);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      go(0, true);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      go(count - 1, true);
+    }
   };
 
-  const getReviewAt = (offset) => {
-    const len = testimonials.length;
-    return testimonials[(activeIndex + offset + len) % len];
-  };
-
-  const prevItem = getReviewAt(-1);
-  const currentItem = getReviewAt(0);
-  const nextItem = getReviewAt(1);
+  const arrowBtn = `flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-[#EAD7B9]/25 text-[#EAD7B9] transition-colors hover:border-[#D08A4A] hover:text-[#D08A4A] ${focusRing}`;
 
   return (
     <section
       id="reviews"
-      className="relative overflow-hidden bg-[#120B06] py-16 sm:py-20 lg:py-28"
+      aria-labelledby="reviews-heading"
+      className={`${body.className} relative overflow-hidden bg-[#1A0F0A] py-16 text-[#EAD7B9] sm:py-20 lg:py-28`}
     >
-      {/* Subtle Golden Trajectory Lines */}
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none opacity-20 -z-0"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M 50 150 Q 300 20 600 350 T 1400 300"
-          fill="none"
-          stroke="#DE9E57"
-          strokeWidth="1"
-        />
-        <path
-          d="M 200 600 Q 550 450 900 650 T 1500 500"
-          fill="none"
-          stroke="#8C572D"
-          strokeWidth="1"
-        />
-      </svg>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[760px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(208,138,74,0.12),transparent)]"
+      />
 
-      <Container className="relative z-10">
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-white leading-tight">
-            Join Thousands of Happy <br />
-            Coffee Lovers!
-          </h2>
-          <p className="mt-4 text-xs sm:text-sm text-[#C4B5A5] leading-relaxed font-normal">
-            Don&apos;t just take our word for it — hear what our customers have
-            to say!
-          </p>
-        </div>
+      <Container className="relative">
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+          {/* Heading + controls */}
+          <div className="lg:col-span-5">
+            <h2
+              id="reviews-heading"
+              className={`${display.className} text-balance text-4xl font-medium leading-tight tracking-tight text-[#F6EEE2] sm:text-5xl`}
+            >
+              Our regulars say it better than we can.
+            </h2>
+            <p className="mt-4 max-w-sm text-base leading-relaxed text-[#C9B697]">
+              Over 1,000 people stop by for their daily cup. Here are a few of
+              them.
+            </p>
 
-        {/* Cinematic Backdrop Banner + 3D Review Cards Track */}
-        <div className="relative mt-12 sm:mt-16 pt-8 pb-4">
-          {/* Panoramic Coffee Beans Background Banner with Unsplash Roast Texture */}
-          <div className="absolute top-12 left-0 right-0 h-44 sm:h-52 rounded-3xl overflow-hidden -z-0 opacity-40">
-            <Image
-              src={unsplash("photo-1514432324607-a09d9b4aefdd", 1200, 600)}
-              alt="Artisanal roasted coffee beans background"
-              fill
-              sizes="100vw"
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#120B06] via-transparent to-[#120B06]" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#120B06] via-transparent to-[#120B06]" />
+            <div className="mt-8 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => go(active - 1)}
+                aria-label="Previous review"
+                className={arrowBtn}
+              >
+                <ChevronLeft aria-hidden className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => go(active + 1)}
+                aria-label="Next review"
+                className={arrowBtn}
+              >
+                <ChevronRight aria-hidden className="h-5 w-5" />
+              </button>
+              <p
+                className="ml-2 text-sm tabular-nums text-[#B9A58B]"
+                aria-live="polite"
+              >
+                {active + 1} of {count}
+              </p>
+            </div>
           </div>
 
-          {/* 3D Carousel Cards Track with Fixed Equal Heights & Widths */}
-          <div className="relative z-10 flex items-center justify-center gap-4 sm:gap-6 min-h-[360px]">
-            {/* Left Card Preview (Previous) */}
+          {/* Quote */}
+          <div className="lg:col-span-7">
             <div
-              onClick={prevReview}
-              className="hidden md:flex flex-col items-center justify-between w-72 sm:w-80 h-[320px] p-6 rounded-2xl bg-[#180E07]/85 border border-[#2E1D11] text-center opacity-60 hover:opacity-100 transition-all duration-300 cursor-pointer hover:border-[#DE9E57]/30 transform translate-y-4 scale-95 shadow-xl"
+              id={`${baseId}-panel`}
+              role="tabpanel"
+              aria-labelledby={`${baseId}-tab-${active}`}
+              className="rounded-3xl border border-[#EAD7B9]/15 bg-[#2A1A11]/70 p-7 sm:p-10"
             >
-              <div>
-                <div className="relative mx-auto w-14 h-14 rounded-full overflow-hidden border border-[#3E2718] mb-3 bg-[#120B06]">
+              <div
+                className="flex items-center gap-1"
+                role="img"
+                aria-label={`Rated ${current.rating} out of 5`}
+              >
+                {Array.from({ length: current.rating }, (_, i) => (
+                  <Star
+                    key={i}
+                    aria-hidden
+                    className="h-4 w-4 fill-[#D08A4A] stroke-none"
+                  />
+                ))}
+              </div>
+
+              <blockquote
+                className={`${display.className} mt-5 max-w-2xl text-2xl leading-snug text-[#F6EEE2] sm:text-3xl`}
+              >
+                &ldquo;{current.quote}&rdquo;
+              </blockquote>
+
+              <div className="mt-8 flex items-center gap-4 border-t border-dotted border-[#EAD7B9]/25 pt-6">
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full ring-1 ring-[#EAD7B9]/25">
                   <Image
-                    src={prevItem.image}
-                    alt={prevItem.name}
+                    src={current.image}
+                    alt=""
                     fill
                     sizes="56px"
                     className="object-cover"
                   />
                 </div>
-                <h4 className="text-sm font-semibold text-white">
-                  {prevItem.name}
-                </h4>
-                <span className="text-xs text-[#8A7868] mt-0.5 block">
-                  {prevItem.role}
-                </span>
-              </div>
-              <div className="flex items-center justify-center gap-1 text-[#DE9E57] my-2">
-                {[...Array(prevItem.rating)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-3 h-3 fill-[#DE9E57] stroke-none"
-                  />
-                ))}
-              </div>
-              <p className="text-xs text-[#C4B5A5]/80 line-clamp-3 italic">
-                &ldquo;{prevItem.quote}&rdquo;
-              </p>
-            </div>
-
-            {/* Active Center Card (Prominent & Elevated) */}
-            <div className="w-full max-w-[320px] sm:max-w-[360px] h-[320px] flex flex-col justify-between p-6 sm:p-7 rounded-2xl bg-[#1C120A] border border-[#3E2718] text-center shadow-2xl shadow-black/80 transition-all duration-500 transform hover:-translate-y-1 z-20">
-              <div>
-                {/* Avatar with warm circular accent */}
-                <div className="relative mx-auto w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-[#8C572D] mb-3 shadow-lg bg-[#24150B]">
-                  <Image
-                    src={currentItem.image}
-                    alt={currentItem.name}
-                    fill
-                    sizes="64px"
-                    className="object-cover"
-                  />
+                <div>
+                  <p className="font-semibold text-[#F6EEE2]">{current.name}</p>
+                  <p className="text-sm text-[#B9A58B]">{current.role}</p>
                 </div>
-
-                {/* Name & Role */}
-                <h3 className="text-base sm:text-lg font-semibold text-white tracking-wide">
-                  {currentItem.name}
-                </h3>
-                <p className="text-xs text-[#9B8B7D] font-medium mt-0.5">
-                  {currentItem.role}
-                </p>
               </div>
-
-              {/* 5 Gold Stars */}
-              <div className="flex items-center justify-center gap-1 text-[#DE9E57] my-1">
-                {[...Array(currentItem.rating)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-3.5 h-3.5 fill-[#DE9E57] stroke-none"
-                  />
-                ))}
-              </div>
-
-              {/* Review Text */}
-              <p className="text-xs sm:text-sm text-[#C4B5A5] leading-relaxed mx-auto font-normal line-clamp-3">
-                &ldquo;{currentItem.quote}&rdquo;
-              </p>
             </div>
 
-            {/* Right Card Preview (Next) */}
+            {/* Regulars: pick a person to read their review */}
             <div
-              onClick={nextReview}
-              className="hidden md:flex flex-col items-center justify-between w-72 sm:w-80 h-[320px] p-6 rounded-2xl bg-[#180E07]/85 border border-[#2E1D11] text-center opacity-60 hover:opacity-100 transition-all duration-300 cursor-pointer hover:border-[#DE9E57]/30 transform translate-y-4 scale-95 shadow-xl"
+              role="tablist"
+              aria-label="Choose a review"
+              className="mt-6 flex flex-wrap gap-3"
             >
-              <div>
-                <div className="relative mx-auto w-14 h-14 rounded-full overflow-hidden border border-[#3E2718] mb-3 bg-[#120B06]">
-                  <Image
-                    src={nextItem.image}
-                    alt={nextItem.name}
-                    fill
-                    sizes="56px"
-                    className="object-cover"
-                  />
-                </div>
-                <h4 className="text-sm font-semibold text-white">
-                  {nextItem.name}
-                </h4>
-                <span className="text-xs text-[#8A7868] mt-0.5 block">
-                  {nextItem.role}
-                </span>
-              </div>
-              <div className="flex items-center justify-center gap-1 text-[#DE9E57] my-2">
-                {[...Array(nextItem.rating)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-3 h-3 fill-[#DE9E57] stroke-none"
-                  />
-                ))}
-              </div>
-              <p className="text-xs text-[#C4B5A5]/80 line-clamp-3 italic">
-                &ldquo;{nextItem.quote}&rdquo;
-              </p>
+              {testimonials.map((t, i) => {
+                const selected = i === active;
+                return (
+                  <button
+                    key={t.id}
+                    ref={(el) => (tabRefs.current[i] = el)}
+                    type="button"
+                    role="tab"
+                    id={`${baseId}-tab-${i}`}
+                    aria-selected={selected}
+                    aria-controls={`${baseId}-panel`}
+                    aria-label={`${t.name}, ${t.role}`}
+                    tabIndex={selected ? 0 : -1}
+                    onClick={() => go(i)}
+                    onKeyDown={onTabKeyDown}
+                    className={`relative h-12 w-12 cursor-pointer overflow-hidden rounded-full transition-opacity ${
+                      selected
+                        ? "opacity-100 ring-2 ring-[#D08A4A] ring-offset-2 ring-offset-[#1A0F0A]"
+                        : "opacity-50 hover:opacity-100"
+                    } ${focusRing}`}
+                  >
+                    <Image
+                      src={t.image}
+                      alt=""
+                      fill
+                      sizes="48px"
+                      className="object-cover"
+                    />
+                  </button>
+                );
+              })}
             </div>
-          </div>
-
-          {/* Carousel Arrows Controls */}
-          <div className="mt-8 flex items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={prevReview}
-              aria-label="Previous customer review"
-              className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#22140A] border border-[#3E2718] text-[#C4B5A5] hover:text-[#DE9E57] hover:border-[#DE9E57]/50 transition-all duration-200 active:scale-95 focus:outline-none cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={nextReview}
-              aria-label="Next customer review"
-              className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#22140A] border border-[#3E2718] text-[#C4B5A5] hover:text-[#DE9E57] hover:border-[#DE9E57]/50 transition-all duration-200 active:scale-95 focus:outline-none cursor-pointer"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </Container>
