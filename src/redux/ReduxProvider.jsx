@@ -4,8 +4,10 @@ import React, { useEffect, useRef } from "react";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import { initializeCart } from "./features/cart/cartSlice";
+import { initializeWishlist } from "./features/wishlist/wishlistSlice";
 
 const CART_STORAGE_KEY = "cafeaura_cart_v1";
+const WISHLIST_STORAGE_KEY = "cafeaura_wishlist_v1";
 
 export default function ReduxProvider({ children }) {
   const isHydrated = useRef(false);
@@ -16,37 +18,63 @@ export default function ReduxProvider({ children }) {
 
     // 1. Rehydrate cart from localStorage safely after mount
     try {
-      const stored = window.localStorage.getItem(CART_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          store.dispatch(initializeCart(parsed));
+      const storedCart = window.localStorage.getItem(CART_STORAGE_KEY);
+      if (storedCart) {
+        const parsedCart = JSON.parse(storedCart);
+        if (Array.isArray(parsedCart) && parsedCart.length > 0) {
+          store.dispatch(initializeCart(parsedCart));
         }
       }
     } catch (err) {
       console.warn("Could not read cart from localStorage:", err);
     }
 
-    // 2. Subscribe to store changes to keep localStorage in sync
+    // 2. Rehydrate wishlist from localStorage safely after mount
+    try {
+      const storedWishlist = window.localStorage.getItem(WISHLIST_STORAGE_KEY);
+      if (storedWishlist) {
+        const parsedWishlist = JSON.parse(storedWishlist);
+        if (Array.isArray(parsedWishlist) && parsedWishlist.length > 0) {
+          store.dispatch(initializeWishlist(parsedWishlist));
+        }
+      }
+    } catch (err) {
+      console.warn("Could not read wishlist from localStorage:", err);
+    }
+
+    // 3. Subscribe to store changes to keep localStorage in sync
     const unsubscribe = store.subscribe(() => {
       try {
         const state = store.getState();
+        // Persist cart
         window.localStorage.setItem(
           CART_STORAGE_KEY,
           JSON.stringify(state.cart.items)
         );
+        // Persist wishlist
+        window.localStorage.setItem(
+          WISHLIST_STORAGE_KEY,
+          JSON.stringify(state.wishlist.items)
+        );
       } catch (err) {
-        console.warn("Could not save cart to localStorage:", err);
+        console.warn("Could not save to localStorage:", err);
       }
     });
 
-    // 3. Sync state across multiple browser tabs
+    // 4. Sync state across multiple browser tabs
     const handleStorageChange = (e) => {
       if (e.key === CART_STORAGE_KEY && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue);
           if (Array.isArray(parsed)) {
             store.dispatch(initializeCart(parsed));
+          }
+        } catch {}
+      } else if (e.key === WISHLIST_STORAGE_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) {
+            store.dispatch(initializeWishlist(parsed));
           }
         } catch {}
       }
