@@ -5,6 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Fraunces, Instrument_Sans } from "next/font/google";
 import { Star, Heart, X, ShoppingBag, Check } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { addToCart } from "@/redux/features/cart/cartSlice";
+import { ProductCard } from "@/components/ProductCard";
 
 const display = Fraunces({ subsets: ["latin"], display: "swap" });
 const body = Instrument_Sans({ subsets: ["latin"], display: "swap" });
@@ -309,6 +312,7 @@ export const Hero = ({
   customerCountLabel = "1,000+",
   onAddToCart,
 }) => {
+  const dispatch = useDispatch();
   const [favoriteIds, setFavoriteIds] = useState(() => new Set());
   const [selected, setSelected] = useState(null);
   const [toast, setToast] = useState("");
@@ -367,13 +371,29 @@ export const Hero = ({
 
   const handleAdd = useCallback(
     (product) => {
+      dispatch(
+        addToCart({
+          id: product.id,
+          name: product.name,
+          price:
+            typeof product.price === "number"
+              ? product.price
+              : product.priceCents
+              ? product.priceCents / 100
+              : 12.0,
+          image: product.image,
+          description: product.notes || product.description,
+          origin: product.origin,
+          quantity: 1,
+        })
+      );
       onAddToCart?.(product);
       setToast(`Added ${product.name} to your order`);
       clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => setToast(""), TOAST_MS);
       closeDetails();
     },
-    [onAddToCart, closeDetails],
+    [dispatch, onAddToCart, closeDetails],
   );
 
   return (
@@ -443,7 +463,7 @@ export const Hero = ({
             <div className="relative aspect-[4/5] overflow-hidden rounded-t-[999px] rounded-b-3xl border border-[#EAD7B9]/20 p-2.5">
               <div className="relative h-full w-full overflow-hidden rounded-t-[999px] rounded-b-2xl">
                 <Image
-                  src={HERO_IMAGE}
+                  src={"/bannerimage.png"}
                   alt="Espresso in a ceramic cup with a golden crema"
                   fill
                   priority
@@ -467,12 +487,13 @@ export const Hero = ({
           </h2>
           <ul className="mt-2 grid divide-y divide-[#EAD7B9]/10 lg:grid-cols-3 lg:gap-x-10 lg:divide-y-0">
             {products.map((product) => (
-              <MenuRow
+              <ProductCard
                 key={product.id}
                 product={product}
+                variant="row"
                 isFavorite={favoriteIds.has(product.id)}
                 onToggleFavorite={toggleFavorite}
-                onOpenDetails={openDetails}
+                onAddToCart={(p) => handleAdd(p)}
               />
             ))}
           </ul>

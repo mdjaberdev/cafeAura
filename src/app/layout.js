@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Header } from "@/components/common/Header";
 import { Footer } from "@/components/common/Footer";
 import { siteConfig } from "@/constants/site";
+import ReduxProvider from "@/redux/ReduxProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -39,9 +41,13 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
       <body className="flex min-h-screen flex-col bg-[#120B06] text-[#F5EBE1] antialiased selection:bg-[#DE9E57]/30 selection:text-white">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <ReduxProvider>
+          <Suspense fallback={<header className="sticky top-0 z-50 w-full h-20 bg-[#150D07] border-b border-white/[0.04]" />}>
+            <Header />
+          </Suspense>
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </ReduxProvider>
       </body>
     </html>
   );
