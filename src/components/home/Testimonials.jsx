@@ -5,6 +5,8 @@ import Image from "next/image";
 import { Fraunces, Instrument_Sans } from "next/font/google";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { RevealOnScroll } from "@/components/animations";
+import { motion, AnimatePresence } from "framer-motion";
 
 /*
   Palette (shared with the rest of the page)
@@ -114,87 +116,91 @@ export const Testimonials = () => {
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
           {/* Heading + controls */}
           <div className="lg:col-span-5">
-            <h2
-              id="reviews-heading"
-              className={`${display.className} text-balance text-4xl font-medium leading-tight tracking-tight text-[#F6EEE2] sm:text-5xl`}
-            >
-              Our regulars say it better than we can.
-            </h2>
-            <p className="mt-4 max-w-sm text-base leading-relaxed text-[#C9B697]">
-              Over 1,000 people stop by for their daily cup. Here are a few of
-              them.
-            </p>
-
-            <div className="mt-8 flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => go(active - 1)}
-                aria-label="Previous review"
-                className={arrowBtn}
+            <RevealOnScroll direction="up" duration={0.6}>
+              <h2
+                id="reviews-heading"
+                className={`${display.className} text-balance text-4xl font-medium leading-tight tracking-tight text-[#F6EEE2] sm:text-5xl`}
               >
-                <ChevronLeft aria-hidden className="h-5 w-5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => go(active + 1)}
-                aria-label="Next review"
-                className={arrowBtn}
-              >
-                <ChevronRight aria-hidden className="h-5 w-5" />
-              </button>
-              <p
-                className="ml-2 text-sm tabular-nums text-[#B9A58B]"
-                aria-live="polite"
-              >
-                {active + 1} of {count}
+                Our regulars say it better than we can.
+              </h2>
+              <p className="mt-4 max-w-sm text-base leading-relaxed text-[#C9B697]">
+                Over 1,000 people stop by for their daily cup. Here are a few of
+                them.
               </p>
-            </div>
+
+              <div className="mt-8 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => go(active - 1)}
+                  aria-label="Previous review"
+                  className={arrowBtn}
+                >
+                  <ChevronLeft aria-hidden className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => go(active + 1)}
+                  aria-label="Next review"
+                  className={arrowBtn}
+                >
+                  <ChevronRight aria-hidden className="h-5 w-5" />
+                </button>
+                <p
+                  className="ml-2 text-sm tabular-nums text-[#B9A58B]"
+                  aria-live="polite"
+                >
+                  {active + 1} of {count}
+                </p>
+              </div>
+            </RevealOnScroll>
           </div>
 
           {/* Quote */}
           <div className="lg:col-span-7">
-            <div
-              id={`${baseId}-panel`}
-              role="tabpanel"
-              aria-labelledby={`${baseId}-tab-${active}`}
-              className="rounded-3xl border border-[#EAD7B9]/15 bg-[#2A1A11]/70 p-7 sm:p-10"
-            >
+            <RevealOnScroll direction="up" delay={0.15} duration={0.65}>
               <div
-                className="flex items-center gap-1"
-                role="img"
-                aria-label={`Rated ${current.rating} out of 5`}
+                id={`${baseId}-panel`}
+                role="tabpanel"
+                aria-labelledby={`${baseId}-tab-${active}`}
+                className="rounded-3xl border border-[#EAD7B9]/15 bg-[#2A1A11]/70 p-7 sm:p-10 shadow-2xl backdrop-blur-sm"
               >
-                {Array.from({ length: current.rating }, (_, i) => (
-                  <Star
-                    key={i}
-                    aria-hidden
-                    className="h-4 w-4 fill-[#D08A4A] stroke-none"
-                  />
-                ))}
-              </div>
-
-              <blockquote
-                className={`${display.className} mt-5 max-w-2xl text-2xl leading-snug text-[#F6EEE2] sm:text-3xl`}
-              >
-                &ldquo;{current.quote}&rdquo;
-              </blockquote>
-
-              <div className="mt-8 flex items-center gap-4 border-t border-dotted border-[#EAD7B9]/25 pt-6">
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full ring-1 ring-[#EAD7B9]/25">
-                  <Image
-                    src={current.image}
-                    alt=""
-                    fill
-                    sizes="56px"
-                    className="object-cover"
-                  />
+                <div
+                  className="flex items-center gap-1"
+                  role="img"
+                  aria-label={`Rated ${current.rating} out of 5`}
+                >
+                  {Array.from({ length: current.rating }, (_, i) => (
+                    <Star
+                      key={i}
+                      aria-hidden
+                      className="h-4 w-4 fill-[#D08A4A] stroke-none"
+                    />
+                  ))}
                 </div>
-                <div>
-                  <p className="font-semibold text-[#F6EEE2]">{current.name}</p>
-                  <p className="text-sm text-[#B9A58B]">{current.role}</p>
+
+                <blockquote
+                  className={`${display.className} mt-5 max-w-2xl text-2xl leading-snug text-[#F6EEE2] sm:text-3xl transition-opacity duration-300`}
+                >
+                  &ldquo;{current.quote}&rdquo;
+                </blockquote>
+
+                <div className="mt-8 flex items-center gap-4 border-t border-dotted border-[#EAD7B9]/25 pt-6">
+                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full ring-1 ring-[#EAD7B9]/25">
+                    <Image
+                      src={current.image}
+                      alt=""
+                      fill
+                      sizes="56px"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#F6EEE2]">{current.name}</p>
+                    <p className="text-sm text-[#B9A58B]">{current.role}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </RevealOnScroll>
 
             {/* Regulars: pick a person to read their review */}
             <div

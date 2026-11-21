@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Fraunces, Instrument_Sans } from "next/font/google";
 import { X, ArrowLeft, ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { RevealOnScroll } from "@/components/animations";
 
 /*
   Palette (shared with the rest of the page)
@@ -246,69 +247,72 @@ export const CoffeeJourney = ({ viewAllHref = "/gallery" }) => {
       />
 
       <Container className="relative">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-xl">
-            <h2
-              id="journey-heading"
-              className={`${display.className} text-balance text-4xl font-medium leading-tight tracking-tight text-[#F6EEE2] sm:text-5xl`}
-            >
-              From the farm to your cup, one careful step at a time.
-            </h2>
-            <p className="mt-4 max-w-md text-base leading-relaxed text-[#C9B697]">
-              Handpicked beans, patient roasting and a counter full of regulars.
-              Here&apos;s what a day at Café Aura looks like.
-            </p>
+        <RevealOnScroll direction="up" duration={0.65}>
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-xl">
+              <h2
+                id="journey-heading"
+                className={`${display.className} text-balance text-4xl font-medium leading-tight tracking-tight text-[#F6EEE2] sm:text-5xl`}
+              >
+                From the farm to your cup, one careful step at a time.
+              </h2>
+              <p className="mt-4 max-w-md text-base leading-relaxed text-[#C9B697]">
+                Handpicked beans, patient roasting and a counter full of regulars.
+                Here&apos;s what a day at Café Aura looks like.
+              </p>
+            </div>
           </div>
-    
-        </div>
+        </RevealOnScroll>
 
-        <div className="mt-14 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-4">
-          <Tile
-            item={galleryItems[0]}
-            index={0}
-            onOpen={open}
-            arch
-            className={colH}
-          />
-
-          <div className={`flex flex-col gap-3 sm:gap-5 ${colH}`}>
+        <RevealOnScroll direction="up" delay={0.15} duration={0.7}>
+          <div className="mt-14 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-4">
             <Tile
-              item={galleryItems[1]}
-              index={1}
+              item={galleryItems[0]}
+              index={0}
               onOpen={open}
-              className="flex-1"
+              arch
+              className={colH}
             />
+
+            <div className={`flex flex-col gap-3 sm:gap-5 ${colH}`}>
+              <Tile
+                item={galleryItems[1]}
+                index={1}
+                onOpen={open}
+                className="flex-1"
+              />
+              <Tile
+                item={galleryItems[2]}
+                index={2}
+                onOpen={open}
+                className="flex-1"
+              />
+            </div>
+
+            <div className={`flex flex-col gap-3 sm:gap-5 ${colH}`}>
+              <Tile
+                item={galleryItems[3]}
+                index={3}
+                onOpen={open}
+                className="h-[38%]"
+              />
+              <Tile
+                item={galleryItems[4]}
+                index={4}
+                onOpen={open}
+                className="flex-1"
+              />
+            </div>
+
             <Tile
-              item={galleryItems[2]}
-              index={2}
+              item={galleryItems[5]}
+              index={5}
               onOpen={open}
-              className="flex-1"
+              arch
+              className={colH}
             />
           </div>
-
-          <div className={`flex flex-col gap-3 sm:gap-5 ${colH}`}>
-            <Tile
-              item={galleryItems[3]}
-              index={3}
-              onOpen={open}
-              className="h-[38%]"
-            />
-            <Tile
-              item={galleryItems[4]}
-              index={4}
-              onOpen={open}
-              className="flex-1"
-            />
-          </div>
-
-          <Tile
-            item={galleryItems[5]}
-            index={5}
-            onOpen={open}
-            arch
-            className={colH}
-          />
-        </div>
+        </RevealOnScroll>
       </Container>
 
       <Lightbox index={active} onClose={close} onPrev={prev} onNext={next} />

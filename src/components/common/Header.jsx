@@ -21,10 +21,14 @@ import {
   addToCart,
 } from "@/redux/features/cart/cartSlice";
 import {
+  selectWishlistTotalItems,
+} from "@/redux/features/wishlist/wishlistSlice";
+import {
   coffeeProducts,
   popularSearches,
 } from "@/data/products";
 import { Container } from "@/components/ui/Container";
+import { motion, AnimatePresence } from "framer-motion";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -69,11 +73,10 @@ export const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [addedItemIds, setAddedItemIds] = useState({});
-  const [isWishlistFilled, setIsWishlistFilled] = useState(false);
-  const [wishlistCount, setWishlistCount] = useState(0);
 
-  // Redux Cart Total Quantity
+  // Redux Total Quantities
   const cartItemCount = useSelector(selectCartTotalItems);
+  const wishlistCount = useSelector(selectWishlistTotalItems);
 
   useEffect(() => {
     setMounted(true);
@@ -92,14 +95,6 @@ export const Header = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isSearchOpen]);
-
-  const handleWishlistClick = useCallback(() => {
-    setIsWishlistFilled((prev) => {
-      const next = !prev;
-      setWishlistCount((c) => Math.max(0, next ? c + 1 : c - 1));
-      return next;
-    });
-  }, []);
 
   const closeMobileMenu = useCallback(() => setIsMobileMenuOpen(false), []);
 
@@ -164,7 +159,7 @@ export const Header = () => {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        className={`sticky top-0 z-50 w-full transition-colors duration-300 ${
           isScrolled
             ? "bg-[#140C07]/95 backdrop-blur-md shadow-lg shadow-black/20 border-b border-[#2B1B10]"
             : "bg-[#150D07] border-b border-white/[0.04]"
@@ -177,8 +172,13 @@ export const Header = () => {
             onClick={closeMobileMenu}
             className="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DE9E57] rounded-lg"
           >
-            <CoffeeLogoIcon className="w-8 h-8 text-[#DE9E57] transition-transform duration-300 group-hover:scale-105" />
-            <span className="font-serif text-xl sm:text-2xl font-medium tracking-wide text-[#DE9E57] select-none">
+            <motion.div
+              whileHover={{ rotate: [-2, 2, 0], scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+            >
+              <CoffeeLogoIcon className="w-8 h-8 text-[#DE9E57]" />
+            </motion.div>
+            <span className="font-serif text-xl sm:text-2xl font-medium tracking-wide text-[#DE9E57] select-none transition-colors group-hover:text-[#EBB36F]">
               Café Aura
             </span>
           </Link>
@@ -203,7 +203,11 @@ export const Header = () => {
                     {item.label}
                   </Link>
                   {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#DE9E57] rounded-full" />
+                    <motion.span
+                      layoutId="activeNavIndicator"
+                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#DE9E57] rounded-full"
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
                   )}
                 </div>
               );
@@ -212,37 +216,43 @@ export const Header = () => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-3.5 sm:gap-4.5">
-            {/* Wishlist */}
-            <button
-              type="button"
-              onClick={handleWishlistClick}
-              aria-label="Wishlist"
-              aria-pressed={isWishlistFilled}
+            {/* Wishlist Link & Live Badge */}
+            <Link
+              href="/wishlist"
+              aria-label={`Wishlist with ${mounted ? wishlistCount : 0} items`}
               className="relative p-1.5 text-[#F5EBE1] hover:text-[#DE9E57] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DE9E57] rounded-full group"
             >
-              <Heart
-                className={`w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${
-                  isWishlistFilled
-                    ? "fill-[#DE9E57] text-[#DE9E57]"
-                    : "stroke-[1.8]"
-                }`}
-              />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#DE9E57] text-[10px] font-semibold text-[#120B06]">
-                  {wishlistCount}
-                </span>
+              <motion.div whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.88 }}>
+                <Heart
+                  className={`w-5 h-5 transition-colors duration-200 ${
+                    mounted && wishlistCount > 0
+                      ? "fill-[#DE9E57] text-[#DE9E57]"
+                      : "stroke-[1.8]"
+                  }`}
+                />
+              </motion.div>
+              {mounted && wishlistCount > 0 && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 flex min-w-4 h-4 px-1 items-center justify-center rounded-full bg-[#DE9E57] text-[10px] font-bold text-[#120B06] ring-2 ring-[#150D07]"
+                >
+                  {wishlistCount > 99 ? "99+" : wishlistCount}
+                </motion.span>
               )}
-            </button>
+            </Link>
 
             {/* Search Icon Trigger */}
-            <button
+            <motion.button
               type="button"
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => setIsSearchOpen(true)}
               aria-label="Search coffee"
-              className="p-1.5 text-[#F5EBE1] hover:text-[#DE9E57] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DE9E57] rounded-full group"
+              className="p-1.5 text-[#F5EBE1] hover:text-[#DE9E57] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DE9E57] rounded-full group cursor-pointer"
             >
-              <Search className="w-5 h-5 stroke-[1.8] transition-transform duration-200 group-hover:scale-110" />
-            </button>
+              <Search className="w-5 h-5 stroke-[1.8]" />
+            </motion.button>
 
             {/* Shopping Cart Icon */}
             <Link
@@ -250,11 +260,17 @@ export const Header = () => {
               aria-label={`Shopping Cart with ${mounted ? cartItemCount : 0} items`}
               className="relative p-1.5 text-[#F5EBE1] hover:text-[#DE9E57] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DE9E57] rounded-full group"
             >
-              <ShoppingBag className="w-5 h-5 stroke-[1.8] transition-transform duration-200 group-hover:scale-110" />
+              <motion.div whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.88 }}>
+                <ShoppingBag className="w-5 h-5 stroke-[1.8]" />
+              </motion.div>
               {mounted && cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1.5 flex min-w-4.5 h-4.5 px-1 items-center justify-center rounded-full bg-[#DE9E57] text-[10px] font-bold text-[#120B06] ring-2 ring-[#150D07] transition-transform duration-200 group-hover:scale-105">
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1.5 flex min-w-4.5 h-4.5 px-1 items-center justify-center rounded-full bg-[#DE9E57] text-[10px] font-bold text-[#120B06] ring-2 ring-[#150D07]"
+                >
                   {cartItemCount > 99 ? "99+" : cartItemCount}
-                </span>
+                </motion.span>
               )}
             </Link>
 
@@ -274,320 +290,356 @@ export const Header = () => {
             </Link>
 
             {/* Mobile Menu Hamburger */}
-            <button
+            <motion.button
               type="button"
+              whileTap={{ scale: 0.9 }}
               onClick={() => setIsMobileMenuOpen((prev) => !prev)}
               aria-label="Toggle navigation menu"
               aria-expanded={isMobileMenuOpen}
-              className="md:hidden p-1.5 text-[#F5EBE1] hover:text-[#DE9E57] transition-colors focus:outline-none"
+              className="md:hidden p-1.5 text-[#F5EBE1] hover:text-[#DE9E57] transition-colors focus:outline-none cursor-pointer"
             >
               {isMobileMenuOpen ? (
                 <X className="w-6 h-6 stroke-[2]" />
               ) : (
                 <Menu className="w-6 h-6 stroke-[2]" />
               )}
-            </button>
+            </motion.button>
           </div>
         </Container>
 
-        {/* Mobile Navigation Drawer */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-[#2B1B10] bg-[#140C07]/98 px-6 py-6 shadow-2xl backdrop-blur-xl animate-in slide-in-from-top-2 duration-200">
-            <nav
-              aria-label="Mobile navigation"
-              className="flex flex-col space-y-4"
+        {/* Animated Mobile Navigation Drawer */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+              className="md:hidden overflow-hidden border-t border-[#2B1B10] bg-[#140C07]/98 px-6 py-6 shadow-2xl backdrop-blur-xl"
             >
-              {NAV_LINKS.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={closeMobileMenu}
-                    className={`flex items-center justify-between text-base py-2 transition-colors ${
-                      isActive
-                        ? "text-[#DE9E57] font-medium"
-                        : "text-[#D6CBC1] hover:text-[#DE9E57]"
-                    }`}
-                  >
-                    <span>{item.label}</span>
-                    {isActive && (
-                      <span className="w-2 h-2 rounded-full bg-[#DE9E57]" />
-                    )}
-                  </Link>
-                );
-              })}
-
-              {/* Cart link in mobile navigation */}
-              <Link
-                href="/cart"
-                onClick={closeMobileMenu}
-                className="flex items-center justify-between text-base py-2 text-[#D6CBC1] hover:text-[#DE9E57] transition-colors"
+              <nav
+                aria-label="Mobile navigation"
+                className="flex flex-col space-y-4"
               >
-                <span className="flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4 text-[#DE9E57]" />
-                  <span>Shopping Cart</span>
-                </span>
-                {mounted && cartItemCount > 0 && (
-                  <span className="px-2 py-0.5 rounded-full bg-[#DE9E57] text-[11px] font-bold text-[#120B06]">
-                    {cartItemCount}
-                  </span>
-                )}
-              </Link>
+                {NAV_LINKS.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={closeMobileMenu}
+                      className={`flex items-center justify-between text-base py-2 transition-colors ${
+                        isActive
+                          ? "text-[#DE9E57] font-medium"
+                          : "text-[#D6CBC1] hover:text-[#DE9E57]"
+                      }`}
+                    >
+                      <span>{item.label}</span>
+                      {isActive && (
+                        <span className="w-2 h-2 rounded-full bg-[#DE9E57]" />
+                      )}
+                    </Link>
+                  );
+                })}
 
-              <div className="pt-4 border-t border-[#2B1B10] flex flex-col gap-3">
+                {/* Wishlist link in mobile navigation */}
                 <Link
-                  href="/login"
+                  href="/wishlist"
                   onClick={closeMobileMenu}
-                  className="w-full py-2.5 text-center text-sm font-medium text-[#F5EBE1] hover:text-[#DE9E57] border border-[#2B1B10] rounded-lg transition-colors"
+                  className="flex items-center justify-between text-base py-2 text-[#D6CBC1] hover:text-[#DE9E57] transition-colors"
                 >
-                  Login
+                  <span className="flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-[#DE9E57]" />
+                    <span>Wishlist</span>
+                  </span>
+                  {mounted && wishlistCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-[#DE9E57] text-[11px] font-bold text-[#120B06]">
+                      {wishlistCount}
+                    </span>
+                  )}
                 </Link>
+
+                {/* Cart link in mobile navigation */}
                 <Link
-                  href="/signup"
+                  href="/cart"
                   onClick={closeMobileMenu}
-                  className="w-full py-2.5 text-center text-sm font-semibold text-[#120B06] bg-[#DE9E57] hover:bg-[#EBB36F] rounded-lg transition-colors"
+                  className="flex items-center justify-between text-base py-2 text-[#D6CBC1] hover:text-[#DE9E57] transition-colors"
                 >
-                  Sign up
+                  <span className="flex items-center gap-2">
+                    <ShoppingBag className="w-4 h-4 text-[#DE9E57]" />
+                    <span>Shopping Cart</span>
+                  </span>
+                  {mounted && cartItemCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-[#DE9E57] text-[11px] font-bold text-[#120B06]">
+                      {cartItemCount}
+                    </span>
+                  )}
                 </Link>
-              </div>
-            </nav>
-          </div>
-        )}
+
+                <div className="pt-4 border-t border-[#2B1B10] flex flex-col gap-3">
+                  <Link
+                    href="/login"
+                    onClick={closeMobileMenu}
+                    className="w-full py-2.5 text-center text-sm font-medium text-[#F5EBE1] hover:text-[#DE9E57] border border-[#2B1B10] rounded-lg transition-colors"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/signup"
+                    onClick={closeMobileMenu}
+                    className="w-full py-2.5 text-center text-sm font-semibold text-[#120B06] bg-[#DE9E57] hover:bg-[#EBB36F] rounded-lg transition-colors"
+                  >
+                    Sign up
+                  </Link>
+                </div>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
-      {/* Functional Product Search Modal */}
-      {isSearchOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Search coffees"
-          className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
-          onClick={() => setIsSearchOpen(false)}
-        >
-          <div
-            className="w-full max-w-2xl bg-[#180E07] border border-[#3E2718] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200"
-            onClick={(e) => e.stopPropagation()}
+      {/* Animated Product Search Modal */}
+      <AnimatePresence>
+        {isSearchOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Search coffees"
+            className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-black/80 backdrop-blur-md"
+            onClick={() => setIsSearchOpen(false)}
           >
-            {/* Search Input Bar */}
-            <form
-              onSubmit={handleSearchSubmit}
-              className="flex items-center gap-3 px-5 py-4 border-b border-[#2D1E13] bg-[#1C120B]"
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: -8 }}
+              transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
+              className="w-full max-w-2xl bg-[#180E07] border border-[#3E2718] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+              onClick={(e) => e.stopPropagation()}
             >
-              <Search className="w-5 h-5 text-[#DE9E57] shrink-0" />
-              <input
-                type="text"
-                autoFocus
-                placeholder="Search roasts (e.g. Latte, Ethiopia, Caramel, Dark Roast)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent text-[#F5EBE1] placeholder-[#7A6A5E] text-sm focus:outline-none"
-              />
-
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  aria-label="Clear search input"
-                  className="text-[#8A7868] hover:text-[#DE9E57] transition-colors p-1"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-
-              <button
-                type="submit"
-                className="px-3.5 py-1.5 rounded-lg bg-[#DE9E57] hover:bg-[#EBB36F] text-[#120B06] text-xs font-semibold transition-all shrink-0 cursor-pointer"
+              {/* Search Input Bar */}
+              <form
+                onSubmit={handleSearchSubmit}
+                className="flex items-center gap-3 px-5 py-4 border-b border-[#2D1E13] bg-[#1C120B]"
               >
-                Search
-              </button>
+                <Search className="w-5 h-5 text-[#DE9E57] shrink-0" />
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="Search roasts (e.g. Latte, Ethiopia, Caramel, Dark Roast)..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-transparent text-[#F5EBE1] placeholder-[#7A6A5E] text-sm focus:outline-none"
+                />
 
-              <button
-                type="button"
-                onClick={() => setIsSearchOpen(false)}
-                aria-label="Close search dialog"
-                className="text-[#8A7868] hover:text-[#DE9E57] transition-colors p-1"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </form>
-
-            {/* Results or Suggestions Body */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-4">
-              {searchQuery.trim() === "" ? (
-                /* Initial State: Popular Searches & Quick Links */
-                <div className="space-y-5">
-                  <div>
-                    <p className="text-xs font-semibold text-[#8A7868] uppercase tracking-wider mb-2.5">
-                      Popular Searches
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {popularSearches.map((term) => (
-                        <button
-                          key={term}
-                          type="button"
-                          onClick={() => setSearchQuery(term)}
-                          className="text-xs px-3.5 py-1.5 rounded-full bg-[#24170E] text-[#D6CBC1] hover:text-[#DE9E57] hover:border-[#DE9E57]/50 border border-[#3A2619] transition-all cursor-pointer"
-                        >
-                          {term}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-[#26170E]">
-                    <p className="text-xs font-semibold text-[#8A7868] uppercase tracking-wider mb-3">
-                      Featured Specialty Roasts
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {coffeeProducts.slice(0, 4).map((coffee) => (
-                        <div
-                          key={coffee.id}
-                          onClick={() => handleSelectProduct(coffee)}
-                          className="flex items-center gap-3 p-2.5 rounded-xl bg-[#20130A] border border-[#2D1D12] hover:border-[#DE9E57]/40 hover:bg-[#25170D] transition-all cursor-pointer group"
-                        >
-                          <div className="relative w-11 h-11 rounded-lg overflow-hidden shrink-0 border border-[#3E2718]">
-                            <Image
-                              src={coffee.image}
-                              alt={coffee.name}
-                              fill
-                              className="object-cover group-hover:scale-105 transition-transform"
-                            />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <h4 className="text-xs font-semibold text-white group-hover:text-[#DE9E57] transition-colors truncate">
-                              {coffee.name}
-                            </h4>
-                            <p className="text-[10px] text-[#8A7868] truncate">
-                              {coffee.origin} • ${coffee.price.toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ) : searchResults.length === 0 ? (
-                /* No Results Found State */
-                <div className="text-center py-10 px-4">
-                  <div className="w-12 h-12 rounded-full bg-[#24170E] border border-[#3A2619] flex items-center justify-center mx-auto mb-3 text-[#8A7868]">
-                    <Coffee className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-sm font-semibold text-white">
-                    No coffees found matching &ldquo;{searchQuery}&rdquo;
-                  </h3>
-                  <p className="text-xs text-[#8A7868] mt-1 max-w-sm mx-auto">
-                    Try searching for terms like &ldquo;Latte&rdquo;, &ldquo;Dark Roast&rdquo;, &ldquo;Colombia&rdquo;, or &ldquo;Caramel&rdquo;.
-                  </p>
+                {searchQuery && (
                   <button
                     type="button"
-                    onClick={() => {
-                      setIsSearchOpen(false);
-                      router.push("/coffee");
-                    }}
-                    className="mt-4 px-4 py-2 rounded-xl bg-[#24170E] hover:bg-[#DE9E57] text-[#DE9E57] hover:text-[#120B06] border border-[#3A2619] hover:border-[#DE9E57] text-xs font-semibold transition-all inline-flex items-center gap-1.5"
+                    onClick={() => setSearchQuery("")}
+                    aria-label="Clear search input"
+                    className="text-[#8A7868] hover:text-[#DE9E57] transition-colors p-1"
                   >
-                    <span>View All Roasts</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <X className="w-4 h-4" />
                   </button>
-                </div>
-              ) : (
-                /* Dynamic Matching Results List */
-                <div>
-                  <div className="flex items-center justify-between pb-2 mb-2 text-xs text-[#8A7868] border-b border-[#26170E]">
-                    <span>
-                      Found <strong className="text-[#DE9E57]">{searchResults.length}</strong> coffee{searchResults.length > 1 ? "s" : ""}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleSearchSubmit}
-                      className="text-[#DE9E57] hover:underline"
-                    >
-                      View all in catalog
-                    </button>
-                  </div>
+                )}
 
-                  <div className="space-y-2">
-                    {searchResults.map((product) => {
-                      const isAdded = !!addedItemIds[product.id];
-                      return (
-                        <div
-                          key={product.id}
-                          onClick={() => handleSelectProduct(product)}
-                          className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[#20130A] border border-[#2E1E12] hover:border-[#DE9E57]/50 hover:bg-[#25170D] transition-all cursor-pointer group"
-                        >
-                          <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                            <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 border border-[#3E2718] bg-[#120B06]">
+                <button
+                  type="submit"
+                  className="px-3.5 py-1.5 rounded-lg bg-[#DE9E57] hover:bg-[#EBB36F] text-[#120B06] text-xs font-semibold transition-all shrink-0 cursor-pointer"
+                >
+                  Search
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsSearchOpen(false)}
+                  aria-label="Close search dialog"
+                  className="text-[#8A7868] hover:text-[#DE9E57] transition-colors p-1"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </form>
+
+              {/* Results or Suggestions Body */}
+              <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                {searchQuery.trim() === "" ? (
+                  /* Initial State: Popular Searches & Quick Links */
+                  <div className="space-y-5">
+                    <div>
+                      <p className="text-xs font-semibold text-[#8A7868] uppercase tracking-wider mb-2.5">
+                        Popular Searches
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {popularSearches.map((term) => (
+                          <button
+                            key={term}
+                            type="button"
+                            onClick={() => setSearchQuery(term)}
+                            className="text-xs px-3.5 py-1.5 rounded-full bg-[#24170E] text-[#D6CBC1] hover:text-[#DE9E57] hover:border-[#DE9E57]/50 border border-[#3A2619] transition-all cursor-pointer"
+                          >
+                            {term}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-[#26170E]">
+                      <p className="text-xs font-semibold text-[#8A7868] uppercase tracking-wider mb-3">
+                        Featured Specialty Roasts
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {coffeeProducts.slice(0, 4).map((coffee) => (
+                          <div
+                            key={coffee.id}
+                            onClick={() => handleSelectProduct(coffee)}
+                            className="flex items-center gap-3 p-2.5 rounded-xl bg-[#20130A] border border-[#2D1D12] hover:border-[#DE9E57]/40 hover:bg-[#25170D] transition-all cursor-pointer group"
+                          >
+                            <div className="relative w-11 h-11 rounded-lg overflow-hidden shrink-0 border border-[#3E2718]">
                               <Image
-                                src={product.image}
-                                alt={product.name}
+                                src={coffee.image}
+                                alt={coffee.name}
                                 fill
-                                className="object-cover group-hover:scale-105 transition-transform"
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
                               />
                             </div>
-
                             <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2">
-                                <h4 className="text-xs sm:text-sm font-semibold text-white group-hover:text-[#DE9E57] transition-colors truncate">
-                                  {product.name}
-                                </h4>
-                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#2D1D12] text-[#C4B5A5] border border-[#3E2718] shrink-0">
-                                  {product.roast}
-                                </span>
-                              </div>
-                              <p className="text-[11px] text-[#8A7868] truncate mt-0.5">
-                                {product.origin} • {product.notes.join(", ")}
+                              <h4 className="text-xs font-semibold text-white group-hover:text-[#DE9E57] transition-colors truncate">
+                                {coffee.name}
+                              </h4>
+                              <p className="text-[10px] text-[#8A7868] truncate">
+                                {coffee.origin} • ${coffee.price.toFixed(2)}
                               </p>
                             </div>
                           </div>
-
-                          <div className="flex items-center gap-3 shrink-0">
-                            <span className="text-xs sm:text-sm font-bold text-white font-mono">
-                              ${product.price.toFixed(2)}
-                            </span>
-
-                            <button
-                              type="button"
-                              onClick={(e) => handleQuickAddToCart(e, product)}
-                              aria-label={`Add ${product.name} to cart`}
-                              className={`p-2 rounded-lg text-xs font-semibold transition-all duration-200 active:scale-95 flex items-center justify-center cursor-pointer ${
-                                isAdded
-                                  ? "bg-[#8E9A74] text-[#120B06]"
-                                  : "bg-[#2D1D12] text-[#DE9E57] hover:bg-[#DE9E57] hover:text-[#120B06] border border-[#3E2718]"
-                              }`}
-                            >
-                              {isAdded ? (
-                                <Check className="w-4 h-4 stroke-[2.5]" />
-                              ) : (
-                                <Plus className="w-4 h-4" />
-                              )}
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                ) : searchResults.length === 0 ? (
+                  /* No Results Found State */
+                  <div className="text-center py-10 px-4">
+                    <div className="w-12 h-12 rounded-full bg-[#24170E] border border-[#3A2619] flex items-center justify-center mx-auto mb-3 text-[#8A7868]">
+                      <Coffee className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-white">
+                      No coffees found matching &ldquo;{searchQuery}&rdquo;
+                    </h3>
+                    <p className="text-xs text-[#8A7868] mt-1 max-w-sm mx-auto">
+                      Try searching for terms like &ldquo;Latte&rdquo;, &ldquo;Dark Roast&rdquo;, &ldquo;Colombia&rdquo;, or &ldquo;Caramel&rdquo;.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSearchOpen(false);
+                        router.push("/coffee");
+                      }}
+                      className="mt-4 px-4 py-2 rounded-xl bg-[#24170E] hover:bg-[#DE9E57] text-[#DE9E57] hover:text-[#120B06] border border-[#3A2619] hover:border-[#DE9E57] text-xs font-semibold transition-all inline-flex items-center gap-1.5"
+                    >
+                      <span>View All Roasts</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  /* Dynamic Matching Results List */
+                  <div>
+                    <div className="flex items-center justify-between pb-2 mb-2 text-xs text-[#8A7868] border-b border-[#26170E]">
+                      <span>
+                        Found <strong className="text-[#DE9E57]">{searchResults.length}</strong> coffee{searchResults.length > 1 ? "s" : ""}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleSearchSubmit}
+                        className="text-[#DE9E57] hover:underline"
+                      >
+                        View all in catalog
+                      </button>
+                    </div>
 
-            {/* Modal Footer */}
-            <div className="px-5 py-3 border-t border-[#26170E] bg-[#150D07] flex items-center justify-between text-[11px] text-[#7A6A5E]">
-              <span>Press <strong>Enter</strong> to search • <strong>ESC</strong> to exit</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSearchOpen(false);
-                  router.push("/coffee");
-                }}
-                className="text-[#DE9E57] hover:underline"
-              >
-                Browse Full Menu →
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                    <div className="space-y-2">
+                      {searchResults.map((product) => {
+                        const isAdded = !!addedItemIds[product.id];
+                        return (
+                          <div
+                            key={product.id}
+                            onClick={() => handleSelectProduct(product)}
+                            className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[#20130A] border border-[#2E1E12] hover:border-[#DE9E57]/50 hover:bg-[#25170D] transition-all cursor-pointer group"
+                          >
+                            <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                              <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 border border-[#3E2718] bg-[#120B06]">
+                                <Image
+                                  src={product.image}
+                                  alt={product.name}
+                                  fill
+                                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                              </div>
+
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-xs sm:text-sm font-semibold text-white group-hover:text-[#DE9E57] transition-colors truncate">
+                                    {product.name}
+                                  </h4>
+                                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#2D1D12] text-[#C4B5A5] border border-[#3E2718] shrink-0">
+                                    {product.roast}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-[#8A7868] truncate mt-0.5">
+                                  {product.origin} • {product.notes.join(", ")}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 shrink-0">
+                              <span className="text-xs sm:text-sm font-bold text-white font-mono">
+                                ${product.price.toFixed(2)}
+                              </span>
+
+                              <button
+                                type="button"
+                                onClick={(e) => handleQuickAddToCart(e, product)}
+                                aria-label={`Add ${product.name} to cart`}
+                                className={`p-2 rounded-lg text-xs font-semibold transition-all duration-200 active:scale-95 flex items-center justify-center cursor-pointer ${
+                                  isAdded
+                                    ? "bg-[#8E9A74] text-[#120B06]"
+                                    : "bg-[#2D1D12] text-[#DE9E57] hover:bg-[#DE9E57] hover:text-[#120B06] border border-[#3E2718]"
+                                }`}
+                              >
+                                {isAdded ? (
+                                  <Check className="w-4 h-4 stroke-[2.5]" />
+                                ) : (
+                                  <Plus className="w-4 h-4" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-5 py-3 border-t border-[#26170E] bg-[#150D07] flex items-center justify-between text-[11px] text-[#7A6A5E]">
+                <span>Press <strong>Enter</strong> to search • <strong>ESC</strong> to exit</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSearchOpen(false);
+                    router.push("/coffee");
+                  }}
+                  className="text-[#DE9E57] hover:underline"
+                >
+                  Browse Full Menu →
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

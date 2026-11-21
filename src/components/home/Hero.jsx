@@ -8,6 +8,7 @@ import { Star, Heart, X, ShoppingBag, Check } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/redux/features/cart/cartSlice";
 import { ProductCard } from "@/components/ProductCard";
+import { motion } from "framer-motion";
 
 const display = Fraunces({ subsets: ["latin"], display: "swap" });
 const body = Instrument_Sans({ subsets: ["latin"], display: "swap" });
@@ -409,30 +410,50 @@ export const Hero = ({
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-10">
-          {/* Copy */}
+          {/* Copy with staggered smooth entrance */}
           <div className="lg:col-span-7">
-            <h1
+            <motion.h1
               id="hero-heading"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.25, 1, 0.5, 1] }}
               className={`${display.className} text-balance text-5xl font-medium leading-[1.04] tracking-tight text-[#F6EEE2] sm:text-6xl lg:text-7xl`}
             >
               Slow mornings, hand-roasted and poured just for you.
-            </h1>
+            </motion.h1>
 
-            <p className="mt-6 max-w-md text-base leading-relaxed text-[#C9B697] sm:text-lg">
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 1, 0.5, 1] }}
+              className="mt-6 max-w-md text-base leading-relaxed text-[#C9B697] sm:text-lg"
+            >
               Small-batch coffee from farms we know by name. Roasted this week,
               brewed the way you like it.
-            </p>
+            </motion.p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
-              <Link
-                href="/coffee"
-                className={`inline-flex items-center rounded-full bg-[#D08A4A] px-7 py-3.5 text-sm font-semibold text-[#1A0F0A] transition-colors hover:bg-[#E0A062] ${focusRing}`}
-              >
-                Shop our roasts
-              </Link>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.28, ease: [0.25, 1, 0.5, 1] }}
+              className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4"
+            >
+              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
+                <Link
+                  href="/coffee"
+                  className={`inline-flex items-center rounded-full bg-[#D08A4A] px-7 py-3.5 text-sm font-semibold text-[#1A0F0A] transition-colors hover:bg-[#E0A062] ${focusRing}`}
+                >
+                  Shop our roasts
+                </Link>
+              </motion.div>
+            </motion.div>
 
-            <div className="mt-10 flex items-center gap-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="mt-10 flex items-center gap-4"
+            >
               <ul className="flex -space-x-2.5" aria-hidden="true">
                 {avatars.map((a) => (
                   <li key={a.id} className="shrink-0">
@@ -454,13 +475,18 @@ export const Hero = ({
                 </strong>{" "}
                 regulars
               </p>
-            </div>
+            </motion.div>
           </div>
 
-          {/* Arched cafe window with steam */}
-          <div className="relative mx-auto w-full max-w-[380px] lg:col-span-5 lg:max-w-[440px]">
+          {/* Arched cafe window with subtle reveal animation */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9, delay: 0.2, ease: [0.25, 1, 0.5, 1] }}
+            className="relative mx-auto w-full max-w-[380px] lg:col-span-5 lg:max-w-[440px]"
+          >
             <Steam />
-            <div className="relative aspect-[4/5] overflow-hidden rounded-t-[999px] rounded-b-3xl border border-[#EAD7B9]/20 p-2.5">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-t-[999px] rounded-b-3xl border border-[#EAD7B9]/20 p-2.5 shadow-2xl shadow-black/80">
               <div className="relative h-full w-full overflow-hidden rounded-t-[999px] rounded-b-2xl">
                 <Image
                   src={"/bannerimage.png"}
@@ -477,11 +503,17 @@ export const Hero = ({
                 />
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        {/* Menu board */}
-        <div className="mt-16 rounded-3xl border border-[#EAD7B9]/15 bg-[#2A1A11]/70 px-5 py-6 sm:px-8 lg:mt-24">
+        {/* Menu board with scroll reveal */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.7, ease: [0.25, 1, 0.5, 1] }}
+          className="mt-16 rounded-3xl border border-[#EAD7B9]/15 bg-[#2A1A11]/70 px-5 py-6 sm:px-8 lg:mt-24 shadow-2xl backdrop-blur-sm"
+        >
           <h2 className={`${display.className} text-2xl text-[#F6EEE2]`}>
             Today&apos;s favorites
           </h2>
@@ -497,7 +529,7 @@ export const Hero = ({
               />
             ))}
           </ul>
-        </div>
+        </motion.div>
       </div>
 
       <ProductDialog

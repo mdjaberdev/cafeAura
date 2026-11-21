@@ -17,6 +17,7 @@ import {
 import { coffeeProducts, categories } from "@/data/products";
 import { ProductCard } from "@/components/ProductCard";
 import { Container } from "@/components/ui/Container";
+import { StaggerContainer, StaggerItem } from "@/components/animations";
 import {
   Star,
   Search,

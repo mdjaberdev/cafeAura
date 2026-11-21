@@ -14,6 +14,11 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import {
+  RevealOnScroll,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/animations";
 
 /*
   Cafe Aura Palette (shared across sections)
@@ -176,104 +181,110 @@ export const WhyChooseUs = () => {
 
       <Container className="relative z-10">
         {/* Section Header */}
-        <div className="mx-auto max-w-2xl text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#EAD7B9]/15 bg-[#2A1A11]/80 px-3.5 py-1.5 text-xs font-medium tracking-wide text-[#D08A4A]">
-            <Sparkles aria-hidden className="h-3.5 w-3.5" />
-            <span>The Café Aura Standard</span>
+        <RevealOnScroll direction="up" duration={0.65}>
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#EAD7B9]/15 bg-[#2A1A11]/80 px-3.5 py-1.5 text-xs font-medium tracking-wide text-[#D08A4A]">
+              <Sparkles aria-hidden className="h-3.5 w-3.5" />
+              <span>The Café Aura Standard</span>
+            </div>
+
+            <h2
+              id="why-us-heading"
+              className={`${display.className} mt-5 text-balance text-4xl font-medium leading-[1.12] tracking-tight text-[#F6EEE2] sm:text-5xl`}
+            >
+              Why{" "}
+              <span className="italic font-normal text-[#D08A4A]">choose us</span>{" "}
+              for your daily cup?
+            </h2>
+
+            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-[#C9B697]">
+              From bean to cup, we ensure every sip is a premium, unhurried
+              experience.
+            </p>
           </div>
-
-          <h2
-            id="why-us-heading"
-            className={`${display.className} mt-5 text-balance text-4xl font-medium leading-[1.12] tracking-tight text-[#F6EEE2] sm:text-5xl`}
-          >
-            Why{" "}
-            <span className="italic font-normal text-[#D08A4A]">choose us</span>{" "}
-            for your daily cup?
-          </h2>
-
-          <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-[#C9B697]">
-            From bean to cup, we ensure every sip is a premium, unhurried
-            experience.
-          </p>
-        </div>
+        </RevealOnScroll>
 
         {/* 4 Feature Cards Grid */}
-        <div className="mt-14 grid grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 lg:grid-cols-4 lg:gap-7">
+        <StaggerContainer
+          staggerDelay={0.08}
+          className="mt-14 grid grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 lg:grid-cols-4 lg:gap-7"
+        >
           {features.map((feature) => {
             const Icon = feature.icon;
             return (
-              <article
-                key={feature.id}
-                className="group relative flex flex-col justify-between rounded-3xl border border-[#EAD7B9]/15 bg-gradient-to-b from-[#2A1A11]/90 to-[#22140D]/95 p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.75)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#D08A4A]/45 sm:p-5"
-              >
-                {/* Top Copper Accent Hairline */}
-                <div
-                  aria-hidden
-                  className="absolute inset-x-7 top-0 h-px bg-gradient-to-r from-transparent via-[#D08A4A]/55 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                />
+              <StaggerItem key={feature.id}>
+                <article
+                  className="group relative flex flex-col justify-between rounded-3xl border border-[#EAD7B9]/15 bg-gradient-to-b from-[#2A1A11]/90 to-[#22140D]/95 p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.75)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#D08A4A]/45 sm:p-5 h-full"
+                >
+                  {/* Top Copper Accent Hairline */}
+                  <div
+                    aria-hidden
+                    className="absolute inset-x-7 top-0 h-px bg-gradient-to-r from-transparent via-[#D08A4A]/55 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  />
 
-                <div>
-                  {/* Photo Container */}
-                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-[#EAD7B9]/15 bg-[#1A0F0A]">
-                    <Image
-                      src={feature.image}
-                      alt={feature.title}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                    />
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1A0F0A]/85 via-[#1A0F0A]/20 to-transparent" />
+                  <div>
+                    {/* Photo Container */}
+                    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-[#EAD7B9]/15 bg-[#1A0F0A]">
+                      <Image
+                        src={feature.image}
+                        alt={feature.title}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                      />
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1A0F0A]/85 via-[#1A0F0A]/20 to-transparent" />
 
-                    {/* Top Index + Icon Pill */}
-                    <div className="absolute inset-x-3 top-3 flex items-center justify-between">
-                      <span className="rounded-full border border-[#EAD7B9]/20 bg-[#1A0F0A]/80 px-2.5 py-0.5 text-[11px] font-medium tabular-nums tracking-wider text-[#D08A4A] backdrop-blur-md">
-                        {feature.index}
-                      </span>
+                      {/* Top Index + Icon Pill */}
+                      <div className="absolute inset-x-3 top-3 flex items-center justify-between">
+                        <span className="rounded-full border border-[#EAD7B9]/20 bg-[#1A0F0A]/80 px-2.5 py-0.5 text-[11px] font-medium tabular-nums tracking-wider text-[#D08A4A] backdrop-blur-md">
+                          {feature.index}
+                        </span>
 
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[#EAD7B9]/15 bg-[#1A0F0A]/80 text-[#D08A4A] backdrop-blur-md transition-colors duration-300 group-hover:border-[#D08A4A] group-hover:bg-[#D08A4A] group-hover:text-[#1A0F0A]">
-                        <Icon aria-hidden className="h-4 w-4" />
-                      </span>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[#EAD7B9]/15 bg-[#1A0F0A]/80 text-[#D08A4A] backdrop-blur-md transition-colors duration-300 group-hover:border-[#D08A4A] group-hover:bg-[#D08A4A] group-hover:text-[#1A0F0A]">
+                          <Icon aria-hidden className="h-4 w-4" />
+                        </span>
+                      </div>
+
+                      {/* Subtitle Tag inside Image */}
+                      <p className="absolute bottom-2.5 left-3 right-3 text-[11px] font-medium uppercase tracking-wider text-[#EAD7B9]/90">
+                        {feature.subtitle}
+                      </p>
                     </div>
 
-                    {/* Subtitle Tag inside Image */}
-                    <p className="absolute bottom-2.5 left-3 right-3 text-[11px] font-medium uppercase tracking-wider text-[#EAD7B9]/90">
-                      {feature.subtitle}
-                    </p>
+                    {/* Title & Description */}
+                    <div className="mt-5 px-1">
+                      <h3
+                        className={`${display.className} text-xl font-medium leading-snug text-[#F6EEE2] transition-colors group-hover:text-[#D08A4A]`}
+                      >
+                        {feature.title}
+                      </h3>
+
+                      <p className="mt-2.5 text-sm leading-relaxed text-[#C9B697]">
+                        {feature.description}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Title & Description */}
-                  <div className="mt-5 px-1">
-                    <h3
-                      className={`${display.className} text-xl font-medium leading-snug text-[#F6EEE2] transition-colors group-hover:text-[#D08A4A]`}
+                  {/* Bottom Dotted Divider & CTA Button */}
+                  <div className="mt-6 flex items-center justify-between border-t border-dotted border-[#EAD7B9]/20 px-1 pt-4">
+                    <span className="text-xs font-medium text-[#B9A58B] transition-colors group-hover:text-[#F6EEE2]">
+                      Read roastery notes
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedFeature(feature)}
+                      aria-label={`Learn more about ${feature.title}`}
+                      className={`inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#EAD7B9]/20 bg-[#1A0F0A]/70 text-[#EAD7B9] transition-all duration-200 hover:border-[#D08A4A] hover:bg-[#D08A4A] hover:text-[#1A0F0A] active:scale-95 ${focusRing}`}
                     >
-                      {feature.title}
-                    </h3>
-
-                    <p className="mt-2.5 text-sm leading-relaxed text-[#C9B697]">
-                      {feature.description}
-                    </p>
+                      <ArrowUpRight aria-hidden className="h-4 w-4" />
+                    </button>
                   </div>
-                </div>
-
-                {/* Bottom Dotted Divider & CTA Button */}
-                <div className="mt-6 flex items-center justify-between border-t border-dotted border-[#EAD7B9]/20 px-1 pt-4">
-                  <span className="text-xs font-medium text-[#B9A58B] transition-colors group-hover:text-[#F6EEE2]">
-                    Read roastery notes
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={() => setSelectedFeature(feature)}
-                    aria-label={`Learn more about ${feature.title}`}
-                    className={`inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#EAD7B9]/20 bg-[#1A0F0A]/70 text-[#EAD7B9] transition-all duration-200 hover:border-[#D08A4A] hover:bg-[#D08A4A] hover:text-[#1A0F0A] active:scale-95 ${focusRing}`}
-                  >
-                    <ArrowUpRight aria-hidden className="h-4 w-4" />
-                  </button>
-                </div>
-              </article>
+                </article>
+              </StaggerItem>
             );
           })}
-        </div>
+        </StaggerContainer>
       </Container>
 
       {/* Interactive Feature Details Modal */}

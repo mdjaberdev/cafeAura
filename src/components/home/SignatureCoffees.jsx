@@ -7,6 +7,12 @@ import { Check } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { ProductCard } from "@/components/ProductCard";
 import { coffeeProducts } from "@/data/products";
+import {
+  RevealOnScroll,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/animations";
+import { motion } from "framer-motion";
 
 const display = Fraunces({ subsets: ["latin"], display: "swap" });
 const body = Instrument_Sans({ subsets: ["latin"], display: "swap" });
@@ -73,40 +79,49 @@ export const SignatureCoffees = ({
       />
 
       <Container className="relative">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-xl">
-            <h2
-              id="signature-heading"
-              className={`${display.className} text-balance text-4xl font-medium leading-tight tracking-tight text-[#F6EEE2] sm:text-5xl`}
-            >
-              Our signature coffees, made to be lingered over.
-            </h2>
-            <p className="mt-4 max-w-md text-base leading-relaxed text-[#C9B697]">
-              Six house drinks, each built around one origin and one idea. Pick
-              a favorite and we&apos;ll make it fresh.
-            </p>
+        {/* Section Header with Reveal */}
+        <RevealOnScroll direction="up" duration={0.65}>
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-xl">
+              <h2
+                id="signature-heading"
+                className={`${display.className} text-balance text-4xl font-medium leading-tight tracking-tight text-[#F6EEE2] sm:text-5xl`}
+              >
+                Our signature coffees, made to be lingered over.
+              </h2>
+              <p className="mt-4 max-w-md text-base leading-relaxed text-[#C9B697]">
+                Six house drinks, each built around one origin and one idea. Pick
+                a favorite and we&apos;ll make it fresh.
+              </p>
+            </div>
+            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
+              <Link
+                href={viewAllHref}
+                className={`shrink-0 self-start rounded text-sm font-medium text-[#EAD7B9] underline decoration-[#EAD7B9]/40 underline-offset-8 transition-colors hover:decoration-[#D08A4A] sm:self-auto ${focusRing}`}
+              >
+                View the full menu
+              </Link>
+            </motion.div>
           </div>
-          <Link
-            href={viewAllHref}
-            className={`shrink-0 self-start rounded text-sm font-medium text-[#EAD7B9] underline decoration-[#EAD7B9]/40 underline-offset-8 transition-colors hover:decoration-[#D08A4A] sm:self-auto ${focusRing}`}
-          >
-            View the full menu
-          </Link>
-        </div>
+        </RevealOnScroll>
 
-        {/* Product Cards using common ProductCard component */}
-        <ul className="mt-14 grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Staggered Entrance for Signature Product Cards */}
+        <StaggerContainer
+          staggerDelay={0.09}
+          className="mt-14 grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {coffees.map((coffee) => (
-            <ProductCard
-              key={coffee.id}
-              product={coffee}
-              variant="signature"
-              isFavorite={!!favorites[coffee.id]}
-              onToggleFavorite={toggleFavorite}
-              onAddToCart={handleProductAdded}
-            />
+            <StaggerItem key={coffee.id}>
+              <ProductCard
+                product={coffee}
+                variant="signature"
+                isFavorite={!!favorites[coffee.id]}
+                onToggleFavorite={toggleFavorite}
+                onAddToCart={handleProductAdded}
+              />
+            </StaggerItem>
           ))}
-        </ul>
+        </StaggerContainer>
       </Container>
 
       {/* Toast Notification */}
