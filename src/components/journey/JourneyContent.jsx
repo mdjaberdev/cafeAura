@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   Sprout,
   Sun,
@@ -12,8 +13,15 @@ import {
   Compass,
   Layers,
 } from "lucide-react";
-import {Container} from "@/components/ui/Container";
+import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import {
+  FadeIn,
+  RevealOnScroll,
+  StaggerContainer,
+  StaggerItem,
+  ScaleIn,
+} from "@/components/animations";
 
 const JOURNEY_STAGES = [
   {
@@ -89,42 +97,55 @@ export default function JourneyContent() {
 
         <Container className="relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1C120A] border border-[#3E2718] text-[#DE9E57] text-xs font-semibold uppercase tracking-[0.2em] mb-6">
-              <Compass className="w-3.5 h-3.5" />
-              Seed to Cup Traceability
-            </span>
+            <FadeIn direction="up" delay={0.05} duration={0.55}>
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1C120A] border border-[#3E2718] text-[#DE9E57] text-xs font-semibold uppercase tracking-[0.2em] mb-6">
+                <Compass className="w-3.5 h-3.5" />
+                Seed to Cup Traceability
+              </span>
+            </FadeIn>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-tight leading-[1.12] mb-6">
-              The Anatomy of an{" "}
-              <span className="text-[#DE9E57]">Exceptional</span> Brew
-            </h1>
+            <FadeIn direction="up" delay={0.14} duration={0.65}>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-tight leading-[1.12] mb-6">
+                The Anatomy of an{" "}
+                <span className="text-[#DE9E57]">Exceptional</span> Brew
+              </h1>
+            </FadeIn>
 
-            <p className="text-base sm:text-lg text-[#C4B5A5] leading-relaxed max-w-2xl mx-auto mb-10">
-              Follow the transformative path of our beans—traversing
-              high-altitude volcanic ridges, meticulous micro-mill processing,
-              and precise artisan roast profiles.
-            </p>
+            <FadeIn direction="up" delay={0.22} duration={0.65}>
+              <p className="text-base sm:text-lg text-[#C4B5A5] leading-relaxed max-w-2xl mx-auto mb-10">
+                Follow the transformative path of our beans—traversing
+                high-altitude volcanic ridges, meticulous micro-mill processing,
+                and precise artisan roast profiles.
+              </p>
+            </FadeIn>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-[#302014]/80">
+            <StaggerContainer
+              staggerDelay={0.08}
+              delayChildren={0.28}
+              className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-[#302014]/80"
+            >
               {[
                 { value: "2,200m", label: "Max Altitude" },
                 { value: "100%", label: "Selective Harvest" },
                 { value: "0.1°C", label: "Roast Precision" },
                 { value: "24h", label: "Fresh Dispatch" },
               ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="p-4 rounded-2xl bg-[#160D07] border border-[#302014]"
-                >
-                  <div className="text-2xl sm:text-3xl font-bold text-[#DE9E57] mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs text-[#8A7868] uppercase tracking-wider">
-                    {stat.label}
-                  </div>
-                </div>
+                <StaggerItem key={stat.label}>
+                  <motion.div
+                    whileHover={{ y: -3 }}
+                    transition={{ duration: 0.25 }}
+                    className="p-4 rounded-2xl bg-[#160D07] border border-[#302014] hover:border-[#DE9E57]/40 transition-colors"
+                  >
+                    <div className="text-2xl sm:text-3xl font-bold text-[#DE9E57] mb-1">
+                      {stat.value}
+                    </div>
+                    <div className="text-xs text-[#8A7868] uppercase tracking-wider">
+                      {stat.label}
+                    </div>
+                  </motion.div>
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerContainer>
           </div>
         </Container>
       </section>
@@ -132,136 +153,159 @@ export default function JourneyContent() {
       {/* 2. INTERACTIVE STAGE EXPLORER */}
       <section className="py-20 md:py-28 bg-[#160D07] border-b border-[#302014]">
         <Container>
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#DE9E57] mb-2">
-                Step-by-Step Provenance
+          <RevealOnScroll direction="up" duration={0.65}>
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#DE9E57] mb-2">
+                  Step-by-Step Provenance
+                </p>
+                <h2 className="text-3xl sm:text-4xl font-bold text-white">
+                  Explore the Four Stages
+                </h2>
+              </div>
+              <p className="text-sm text-[#C4B5A5] max-w-md">
+                Click through each milestone below to examine the specialized
+                techniques applied at every juncture of production.
               </p>
-              <h2 className="text-3xl sm:text-4xl font-bold text-white">
-                Explore the Four Stages
-              </h2>
             </div>
-            <p className="text-sm text-[#C4B5A5] max-w-md">
-              Click through each milestone below to examine the specialized
-              techniques applied at every juncture of production.
-            </p>
-          </div>
+          </RevealOnScroll>
 
           {/* Stage Switcher Tabs */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
-            {JOURNEY_STAGES.map((stage, idx) => {
-              const isActive = idx === activeStage;
-              const Icon = stage.icon;
-              return (
-                <button
-                  key={stage.id}
-                  type="button"
-                  onClick={() => setActiveStage(idx)}
-                  className={`text-left p-4 sm:p-5 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center gap-3.5 ${
-                    isActive
-                      ? "bg-[#1C120A] border-[#DE9E57] shadow-[0_0_25px_rgba(222,158,87,0.12)]"
-                      : "bg-[#120B06] border-[#302014] hover:border-[#DE9E57]/40"
-                  }`}
-                >
-                  <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+          <RevealOnScroll direction="up" delay={0.1} duration={0.6}>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
+              {JOURNEY_STAGES.map((stage, idx) => {
+                const isActive = idx === activeStage;
+                const Icon = stage.icon;
+                return (
+                  <motion.button
+                    key={stage.id}
+                    type="button"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setActiveStage(idx)}
+                    className={`text-left p-4 sm:p-5 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center gap-3.5 ${
                       isActive
-                        ? "bg-[#DE9E57] text-[#120B06]"
-                        : "bg-[#160D07] border border-[#3E2718] text-[#DE9E57]"
+                        ? "bg-[#1C120A] border-[#DE9E57] shadow-[0_0_25px_rgba(222,158,87,0.12)]"
+                        : "bg-[#120B06] border-[#302014] hover:border-[#DE9E57]/40"
                     }`}
                   >
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-semibold uppercase tracking-wider text-[#DE9E57] mb-0.5">
-                      Stage {stage.step}
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                        isActive
+                          ? "bg-[#DE9E57] text-[#120B06]"
+                          : "bg-[#160D07] border border-[#3E2718] text-[#DE9E57]"
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
                     </div>
-                    <div className="text-xs sm:text-sm font-bold text-[#F5EBE1] line-clamp-1">
-                      {stage.title.split(" ")[0]} {stage.title.split(" ")[1]}
+                    <div>
+                      <div className="text-xs font-semibold uppercase tracking-wider text-[#DE9E57] mb-0.5">
+                        Stage {stage.step}
+                      </div>
+                      <div className="text-xs sm:text-sm font-bold text-[#F5EBE1] line-clamp-1">
+                        {stage.title.split(" ")[0]} {stage.title.split(" ")[1]}
+                      </div>
                     </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </RevealOnScroll>
 
           {/* Active Stage Detail Card */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center rounded-3xl bg-[#1C120A] border border-[#3E2718] p-6 sm:p-10">
-            <div className="lg:col-span-6 relative overflow-hidden rounded-2xl bg-[#120B06] border border-[#302014] aspect-[16/10]">
-              <img
-                src={current.image}
-                alt={current.title}
-                className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
-              />
-              <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-[#120B06]/80 backdrop-blur-md border border-[#DE9E57]/40 text-xs font-semibold text-[#DE9E57]">
-                Phase {current.step} of 04
-              </div>
-            </div>
-
-            <div className="lg:col-span-6 space-y-6">
-              <div>
-                <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#DE9E57] mb-2">
-                  <span>{current.title}</span>
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-                  {current.subtitle}
-                </h3>
-                <p className="text-[#C4B5A5] leading-relaxed text-sm sm:text-base">
-                  {current.description}
-                </p>
-              </div>
-
-              <div className="pt-4 border-t border-[#302014]">
-                <p className="text-xs uppercase tracking-wider text-[#8A7868] mb-3">
-                  Key Technical Parameters
-                </p>
-                <div className="flex flex-wrap gap-2.5">
-                  {current.metrics.map((metric) => (
-                    <span
-                      key={metric}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#120B06] border border-[#3E2718] text-xs font-medium text-[#F5EBE1]"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#DE9E57]" />
-                      {metric}
-                    </span>
-                  ))}
+          <ScaleIn delay={0.15} duration={0.6}>
+            <FadeIn
+              key={current.id}
+              direction="up"
+              distance={12}
+              duration={0.4}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center rounded-3xl bg-[#1C120A] border border-[#3E2718] p-6 sm:p-10"
+            >
+              <div className="lg:col-span-6 relative overflow-hidden rounded-2xl bg-[#120B06] border border-[#302014] aspect-[16/10]">
+                <img
+                  src={current.image}
+                  alt={current.title}
+                  className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
+                />
+                <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-[#120B06]/80 backdrop-blur-md border border-[#DE9E57]/40 text-xs font-semibold text-[#DE9E57]">
+                  Phase {current.step} of 04
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setActiveStage((prev) => (prev + 1) % JOURNEY_STAGES.length)
-                  }
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-[#DE9E57] hover:text-[#EBB36F] transition-colors cursor-pointer"
-                >
-                  Next Journey Phase <ArrowRight className="w-4 h-4" />
-                </button>
+              <div className="lg:col-span-6 space-y-6">
+                <div>
+                  <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#DE9E57] mb-2">
+                    <span>{current.title}</span>
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+                    {current.subtitle}
+                  </h3>
+                  <p className="text-[#C4B5A5] leading-relaxed text-sm sm:text-base">
+                    {current.description}
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-[#302014]">
+                  <p className="text-xs uppercase tracking-wider text-[#8A7868] mb-3">
+                    Key Technical Parameters
+                  </p>
+                  <div className="flex flex-wrap gap-2.5">
+                    {current.metrics.map((metric) => (
+                      <span
+                        key={metric}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#120B06] border border-[#3E2718] text-xs font-medium text-[#F5EBE1]"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#DE9E57]" />
+                        {metric}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-2 flex items-center gap-4">
+                  <motion.button
+                    type="button"
+                    whileHover={{ x: 4 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() =>
+                      setActiveStage(
+                        (prev) => (prev + 1) % JOURNEY_STAGES.length,
+                      )
+                    }
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#DE9E57] hover:text-[#EBB36F] transition-colors cursor-pointer"
+                  >
+                    Next Journey Phase <ArrowRight className="w-4 h-4" />
+                  </motion.button>
+                </div>
               </div>
-            </div>
-          </div>
+            </FadeIn>
+          </ScaleIn>
         </Container>
       </section>
 
       {/* 3. BENTO GRID GALLERY HIGHLIGHT */}
       <section className="py-20 md:py-28 bg-[#120B06] border-b border-[#302014]">
         <Container>
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#DE9E57] mb-3">
-              <Layers className="w-4 h-4" />
-              Visual Archive
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Glimpses From the Estates & Roastery
-            </h2>
-            <p className="text-[#C4B5A5] text-sm sm:text-base">
-              A visual chronicle of the hands, soils, and machinery that shape
-              our craft every single day.
-            </p>
-          </div>
+          <RevealOnScroll direction="up" duration={0.65}>
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#DE9E57] mb-3">
+                <Layers className="w-4 h-4" />
+                Visual Archive
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+                Glimpses From the Estates & Roastery
+              </h2>
+              <p className="text-[#C4B5A5] text-sm sm:text-base">
+                A visual chronicle of the hands, soils, and machinery that shape
+                our craft every single day.
+              </p>
+            </div>
+          </RevealOnScroll>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <StaggerContainer
+            staggerDelay={0.1}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
             {[
               {
                 title: "High-Elevation Canopy",
@@ -282,58 +326,73 @@ export default function JourneyContent() {
                   "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=800&q=80",
               },
             ].map((card, idx) => (
-              <div
-                key={idx}
-                className="group relative rounded-3xl overflow-hidden border border-[#302014] bg-[#160D07] aspect-[4/3]"
-              >
-                <img
-                  src={card.image}
-                  alt={card.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#120B06] via-[#120B06]/40 to-transparent opacity-90" />
-                <div className="absolute bottom-5 left-5 right-5">
-                  <div className="text-xs font-semibold text-[#DE9E57] uppercase tracking-wider mb-1">
-                    {card.title}
+              <StaggerItem key={idx}>
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  transition={{ duration: 0.25 }}
+                  className="group relative rounded-3xl overflow-hidden border border-[#302014] hover:border-[#DE9E57]/40 bg-[#160D07] aspect-[4/3] transition-colors"
+                >
+                  <img
+                    src={card.image}
+                    alt={card.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#120B06] via-[#120B06]/40 to-transparent opacity-90" />
+                  <div className="absolute bottom-5 left-5 right-5">
+                    <div className="text-xs font-semibold text-[#DE9E57] uppercase tracking-wider mb-1">
+                      {card.title}
+                    </div>
+                    <div className="text-sm text-[#F5EBE1] font-medium">
+                      {card.desc}
+                    </div>
                   </div>
-                  <div className="text-sm text-[#F5EBE1] font-medium">
-                    {card.desc}
-                  </div>
-                </div>
-              </div>
+                </motion.div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </Container>
       </section>
 
       {/* 4. BOTTOM CONVERSION CTA */}
       <section className="py-20 md:py-24 bg-[#160D07]">
         <Container>
-          <div className="relative rounded-3xl bg-gradient-to-br from-[#1C120A] via-[#1A1009] to-[#120B06] border border-[#3E2718] p-8 sm:p-14 text-center overflow-hidden">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-[#DE9E57]/10 blur-3xl"
-            />
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Taste the Result of This Journey
-            </h2>
-            <p className="text-[#C4B5A5] max-w-xl mx-auto mb-8 text-sm sm:text-base">
-              Experience single-origin coffees harvested from high-elevation
-              partner farms and roasted fresh to order.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/coffee">
-                <Button className="bg-[#DE9E57] hover:bg-[#EBB36F] text-[#120B06] font-semibold px-8 py-3.5 rounded-full inline-flex items-center gap-2">
-                  Shop Specialty Roasts <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-              <Link href="/story">
-                <Button className="bg-transparent border border-[#3E2718] hover:border-[#DE9E57] text-[#F5EBE1] font-medium px-8 py-3.5 rounded-full">
-                  Our Heritage Story
-                </Button>
-              </Link>
+          <ScaleIn duration={0.65}>
+            <div className="relative rounded-3xl bg-gradient-to-br from-[#1C120A] via-[#1A1009] to-[#120B06] border border-[#3E2718] p-8 sm:p-14 text-center overflow-hidden">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-[#DE9E57]/10 blur-3xl"
+              />
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+                Taste the Result of This Journey
+              </h2>
+              <p className="text-[#C4B5A5] max-w-xl mx-auto mb-8 text-sm sm:text-base">
+                Experience single-origin coffees harvested from high-elevation
+                partner farms and roasted fresh to order.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <Link href="/coffee">
+                    <Button className="bg-[#DE9E57] hover:bg-[#EBB36F] text-[#120B06] font-semibold px-8 py-3.5 rounded-full inline-flex items-center gap-2 cursor-pointer">
+                      Shop Specialty Roasts <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <Link href="/story">
+                    <Button className="bg-transparent border border-[#3E2718] hover:border-[#DE9E57] text-[#F5EBE1] font-medium px-8 py-3.5 rounded-full cursor-pointer">
+                      Our Heritage Story
+                    </Button>
+                  </Link>
+                </motion.div>
+              </div>
             </div>
-          </div>
+          </ScaleIn>
         </Container>
       </section>
     </div>

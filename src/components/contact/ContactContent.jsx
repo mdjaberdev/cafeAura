@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   Mail,
   Phone,
@@ -15,8 +16,15 @@ import {
   Sparkles,
   ArrowRight,
 } from "lucide-react";
-import {Container} from "@/components/ui/Container";
+import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import {
+  FadeIn,
+  RevealOnScroll,
+  StaggerContainer,
+  StaggerItem,
+  ScaleIn,
+} from "@/components/animations";
 
 const INQUIRY_TOPICS = [
   { id: "general", label: "General & Brew Advice", icon: Coffee },
@@ -99,21 +107,27 @@ export default function ContactContent() {
 
         <Container className="relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1C120A] border border-[#3E2718] text-[#DE9E57] text-xs font-semibold uppercase tracking-[0.2em] mb-6">
-              <Mail className="w-3.5 h-3.5" />
-              Roastery Concierge
-            </span>
+            <FadeIn direction="up" delay={0.05} duration={0.55}>
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1C120A] border border-[#3E2718] text-[#DE9E57] text-xs font-semibold uppercase tracking-[0.2em] mb-6">
+                <Mail className="w-3.5 h-3.5" />
+                Roastery Concierge
+              </span>
+            </FadeIn>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-tight leading-[1.12] mb-6">
-              Let’s Talk <span className="text-[#DE9E57]">Specialty</span>{" "}
-              Coffee
-            </h1>
+            <FadeIn direction="up" delay={0.14} duration={0.65}>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-tight leading-[1.12] mb-6">
+                Let’s Talk <span className="text-[#DE9E57]">Specialty</span>{" "}
+                Coffee
+              </h1>
+            </FadeIn>
 
-            <p className="text-base sm:text-lg text-[#C4B5A5] leading-relaxed max-w-2xl mx-auto">
-              Whether you need dial-in advice for your home espresso setup,
-              assistance with an active roast subscription, or wholesale supply
-              for your café, our master roasters are here to help.
-            </p>
+            <FadeIn direction="up" delay={0.22} duration={0.65}>
+              <p className="text-base sm:text-lg text-[#C4B5A5] leading-relaxed max-w-2xl mx-auto">
+                Whether you need dial-in advice for your home espresso setup,
+                assistance with an active roast subscription, or wholesale
+                supply for your café, our master roasters are here to help.
+              </p>
+            </FadeIn>
           </div>
         </Container>
       </section>
@@ -121,33 +135,40 @@ export default function ContactContent() {
       {/* 2. QUICK CONTACT CARDS */}
       <section className="py-12 bg-[#160D07] border-b border-[#302014]">
         <Container>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <StaggerContainer
+            staggerDelay={0.1}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          >
             {CONTACT_CHANNELS.map((item) => {
               const Icon = item.icon;
               return (
-                <a
-                  key={item.title}
-                  href={item.href}
-                  className="group p-6 sm:p-8 rounded-3xl bg-[#1C120A] border border-[#302014] hover:border-[#DE9E57]/50 transition-all duration-300 flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="w-12 h-12 rounded-2xl bg-[#120B06] border border-[#3E2718] flex items-center justify-center text-[#DE9E57] group-hover:bg-[#DE9E57] group-hover:text-[#120B06] transition-colors mb-5">
-                      <Icon className="w-5 h-5" />
+                <StaggerItem key={item.title}>
+                  <motion.a
+                    href={item.href}
+                    whileHover={{ y: -4 }}
+                    whileTap={{ scale: 0.99 }}
+                    transition={{ duration: 0.25 }}
+                    className="group h-full p-6 sm:p-8 rounded-3xl bg-[#1C120A] border border-[#302014] hover:border-[#DE9E57]/50 transition-colors duration-300 flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="w-12 h-12 rounded-2xl bg-[#120B06] border border-[#3E2718] flex items-center justify-center text-[#DE9E57] group-hover:bg-[#DE9E57] group-hover:text-[#120B06] transition-colors mb-5">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-[#8A7868] mb-1">
+                        {item.title}
+                      </p>
+                      <h2 className="text-lg sm:text-xl font-bold text-white group-hover:text-[#DE9E57] transition-colors mb-2">
+                        {item.detail}
+                      </h2>
                     </div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-[#8A7868] mb-1">
-                      {item.title}
+                    <p className="text-xs text-[#C4B5A5] pt-3 border-t border-[#302014]">
+                      {item.subtext}
                     </p>
-                    <h2 className="text-lg sm:text-xl font-bold text-white group-hover:text-[#DE9E57] transition-colors mb-2">
-                      {item.detail}
-                    </h2>
-                  </div>
-                  <p className="text-xs text-[#C4B5A5] pt-3 border-t border-[#302014]">
-                    {item.subtext}
-                  </p>
-                </a>
+                  </motion.a>
+                </StaggerItem>
               );
             })}
-          </div>
+          </StaggerContainer>
         </Container>
       </section>
 
@@ -156,41 +177,53 @@ export default function ContactContent() {
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             {/* LEFT: MESSAGE FORM (7 cols) */}
-            <div className="lg:col-span-7 rounded-3xl bg-[#1A1009] border border-[#3E2718] p-6 sm:p-10">
+            <RevealOnScroll
+              direction="up"
+              duration={0.65}
+              className="lg:col-span-7 rounded-3xl bg-[#1A1009] border border-[#3E2718] p-6 sm:p-10"
+            >
               {submitted ? (
-                <div className="py-12 text-center space-y-5">
-                  <div className="w-16 h-16 rounded-full bg-[#DE9E57]/15 border border-[#DE9E57]/40 flex items-center justify-center text-[#DE9E57] mx-auto">
-                    <CheckCircle2 className="w-8 h-8" />
+                <ScaleIn duration={0.45}>
+                  <div className="py-12 text-center space-y-5">
+                    <div className="w-16 h-16 rounded-full bg-[#DE9E57]/15 border border-[#DE9E57]/40 flex items-center justify-center text-[#DE9E57] mx-auto">
+                      <CheckCircle2 className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-2xl sm:text-3xl font-bold text-white">
+                      Message Received by Our Roastery
+                    </h3>
+                    <p className="text-[#C4B5A5] max-w-md mx-auto text-sm sm:text-base leading-relaxed">
+                      Thank you,{" "}
+                      <span className="text-white font-semibold">
+                        {formData.name}
+                      </span>
+                      . Our concierge team has logged your inquiry regarding{" "}
+                      <span className="text-[#DE9E57] font-medium">
+                        {
+                          INQUIRY_TOPICS.find((t) => t.id === selectedTopic)
+                            ?.label
+                        }
+                      </span>{" "}
+                      and will reply to{" "}
+                      <span className="text-white">{formData.email}</span>{" "}
+                      shortly.
+                    </p>
+                    <div className="pt-4">
+                      <motion.div
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        className="inline-block"
+                      >
+                        <Button
+                          type="button"
+                          onClick={handleReset}
+                          className="bg-[#DE9E57] hover:bg-[#EBB36F] text-[#120B06] font-semibold px-7 py-3 rounded-full cursor-pointer"
+                        >
+                          Send Another Inquiry
+                        </Button>
+                      </motion.div>
+                    </div>
                   </div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-white">
-                    Message Received by Our Roastery
-                  </h3>
-                  <p className="text-[#C4B5A5] max-w-md mx-auto text-sm sm:text-base leading-relaxed">
-                    Thank you,{" "}
-                    <span className="text-white font-semibold">
-                      {formData.name}
-                    </span>
-                    . Our concierge team has logged your inquiry regarding{" "}
-                    <span className="text-[#DE9E57] font-medium">
-                      {
-                        INQUIRY_TOPICS.find((t) => t.id === selectedTopic)
-                          ?.label
-                      }
-                    </span>{" "}
-                    and will reply to{" "}
-                    <span className="text-white">{formData.email}</span>{" "}
-                    shortly.
-                  </p>
-                  <div className="pt-4">
-                    <Button
-                      type="button"
-                      onClick={handleReset}
-                      className="bg-[#DE9E57] hover:bg-[#EBB36F] text-[#120B06] font-semibold px-7 py-3 rounded-full"
-                    >
-                      Send Another Inquiry
-                    </Button>
-                  </div>
-                </div>
+                </ScaleIn>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
@@ -212,11 +245,13 @@ export default function ContactContent() {
                         const Icon = topic.icon;
                         const isSelected = selectedTopic === topic.id;
                         return (
-                          <button
+                          <motion.button
                             key={topic.id}
                             type="button"
+                            whileHover={{ scale: 1.015 }}
+                            whileTap={{ scale: 0.98 }}
                             onClick={() => setSelectedTopic(topic.id)}
-                            className={`flex items-center gap-2.5 px-4 py-3 rounded-xl border text-left text-xs sm:text-sm font-medium transition-all cursor-pointer ${
+                            className={`flex items-center gap-2.5 px-4 py-3 rounded-xl border text-left text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
                               isSelected
                                 ? "bg-[#1C120A] border-[#DE9E57] text-white shadow-[0_0_20px_rgba(222,158,87,0.12)]"
                                 : "bg-[#120B06] border-[#302014] text-[#C4B5A5] hover:border-[#DE9E57]/40"
@@ -228,7 +263,7 @@ export default function ContactContent() {
                               }`}
                             />
                             <span className="truncate">{topic.label}</span>
-                          </button>
+                          </motion.button>
                         );
                       })}
                     </div>
@@ -313,85 +348,104 @@ export default function ContactContent() {
                     />
                   </div>
 
-                  <Button
-                    type="submit"
-                    className="w-full sm:w-auto bg-[#DE9E57] hover:bg-[#EBB36F] text-[#120B06] font-semibold px-8 py-3.5 rounded-full inline-flex items-center justify-center gap-2 cursor-pointer"
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="inline-block w-full sm:w-auto"
                   >
-                    Send Message <Send className="w-4 h-4" />
-                  </Button>
+                    <Button
+                      type="submit"
+                      className="w-full sm:w-auto bg-[#DE9E57] hover:bg-[#EBB36F] text-[#120B06] font-semibold px-8 py-3.5 rounded-full inline-flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      Send Message <Send className="w-4 h-4" />
+                    </Button>
+                  </motion.div>
                 </form>
               )}
-            </div>
+            </RevealOnScroll>
 
             {/* RIGHT: ROASTERY SHOWCASE & HOURS (5 cols) */}
             <div id="roastery-location" className="lg:col-span-5 space-y-6">
               {/* Roastery Visual Card */}
-              <div className="rounded-3xl overflow-hidden bg-[#1C120A] border border-[#302014]">
-                <div className="relative aspect-[16/10] overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1000&q=80"
-                    alt="Café Aura Flagship Tasting Bar"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1C120A] via-transparent to-transparent" />
-                  <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-[#120B06]/85 backdrop-blur-md border border-[#DE9E57]/40 text-xs font-semibold text-[#DE9E57]">
-                    Flagship Tasting Room
-                  </span>
-                </div>
-
-                <div className="p-6 sm:p-8 space-y-5">
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-1">
-                      Visit Our Roasting House
-                    </h3>
-                    <p className="text-sm text-[#C4B5A5]">
-                      Experience live small-batch drum roasting, flight
-                      tastings, and freshly pulled single-origin espresso.
-                    </p>
+              <RevealOnScroll direction="up" delay={0.12} duration={0.65}>
+                <div className="group rounded-3xl overflow-hidden bg-[#1C120A] border border-[#302014]">
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <img
+                      src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1000&q=80"
+                      alt="Café Aura Flagship Tasting Bar"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1C120A] via-transparent to-transparent" />
+                    <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-[#120B06]/85 backdrop-blur-md border border-[#DE9E57]/40 text-xs font-semibold text-[#DE9E57]">
+                      Flagship Tasting Room
+                    </span>
                   </div>
 
-                  {/* Operating Hours */}
-                  <div className="pt-4 border-t border-[#302014]">
-                    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#DE9E57] mb-3">
-                      <Clock className="w-3.5 h-3.5" />
-                      Tasting Bar & Pickup Hours
+                  <div className="p-6 sm:p-8 space-y-5">
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-1">
+                        Visit Our Roasting House
+                      </h3>
+                      <p className="text-sm text-[#C4B5A5]">
+                        Experience live small-batch drum roasting, flight
+                        tastings, and freshly pulled single-origin espresso.
+                      </p>
                     </div>
-                    <ul className="space-y-2.5 text-sm">
-                      {ROASTERY_HOURS.map((slot) => (
-                        <li
-                          key={slot.day}
-                          className="flex items-center justify-between text-[#C4B5A5]"
-                        >
-                          <span>{slot.day}</span>
-                          <span className="font-semibold text-[#F5EBE1]">
-                            {slot.hours}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+
+                    {/* Operating Hours */}
+                    <div className="pt-4 border-t border-[#302014]">
+                      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#DE9E57] mb-3">
+                        <Clock className="w-3.5 h-3.5" />
+                        Tasting Bar & Pickup Hours
+                      </div>
+                      <ul className="space-y-2.5 text-sm">
+                        {ROASTERY_HOURS.map((slot) => (
+                          <li
+                            key={slot.day}
+                            className="flex items-center justify-between text-[#C4B5A5]"
+                          >
+                            <span>{slot.day}</span>
+                            <span className="font-semibold text-[#F5EBE1]">
+                              {slot.hours}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </RevealOnScroll>
 
               {/* Wholesale Highlight Banner */}
-              <div className="p-6 sm:p-7 rounded-3xl bg-[#160D07] border border-[#3E2718] flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-[#DE9E57] mb-1">
-                    For Cafés & Restaurants
-                  </p>
-                  <p className="text-sm text-[#F5EBE1] font-medium">
-                    Request a complimentary green & roasted sample box for your
-                    bar.
-                  </p>
-                </div>
-                <Link
-                  href="/coffee"
-                  className="w-10 h-10 rounded-full bg-[#1C120A] border border-[#3E2718] hover:border-[#DE9E57] flex items-center justify-center text-[#DE9E57] shrink-0 transition-colors"
-                  aria-label="Explore Coffee Catalog"
+              <RevealOnScroll direction="up" delay={0.22} duration={0.6}>
+                <motion.div
+                  whileHover={{ y: -3 }}
+                  transition={{ duration: 0.25 }}
+                  className="p-6 sm:p-7 rounded-3xl bg-[#160D07] border border-[#3E2718] flex items-center justify-between gap-4"
                 >
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[#DE9E57] mb-1">
+                      For Cafés & Restaurants
+                    </p>
+                    <p className="text-sm text-[#F5EBE1] font-medium">
+                      Request a complimentary green & roasted sample box for
+                      your bar.
+                    </p>
+                  </div>
+                  <motion.div
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.94 }}
+                  >
+                    <Link
+                      href="/coffee"
+                      className="w-10 h-10 rounded-full bg-[#1C120A] border border-[#3E2718] hover:border-[#DE9E57] flex items-center justify-center text-[#DE9E57] shrink-0 transition-colors"
+                      aria-label="Explore Coffee Catalog"
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </motion.div>
+                </motion.div>
+              </RevealOnScroll>
             </div>
           </div>
         </Container>
